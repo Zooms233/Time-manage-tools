@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四象限图任务管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .quadrant {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .quadrant-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quadrant-selector {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #999;
+            border-radius: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quadrant-selector.selected {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .quadrant-selector.selected::after {
+            content: "✓";
+            color: white;
+            font-size: 12px;
+        }
+        
+        .important-not-urgent {
+            background-color: #ffffcc;
+            border-left: 5px solid #ffeb3b;
+        }
+        
+        .important-urgent {
+            background-color: #ffebee;
+            border-left: 5px solid #f44336;
+        }
+        
+        .not-important-not-urgent {
+            background-color: #e8f5e8;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .not-important-urgent {
+            background-color: #e3f2fd;
+            border-left: 5px solid #2196f3;
+        }
+        
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+            flex-grow: 1;
+            max-height: 200px; /* 限制最大高度 */
+            overflow-y: auto; /* 超出部分滚动 */
+        }
+        
+        .item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .item.completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        
+        .item-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .item-text {
+            font-size: 18px;
+            flex-grow: 1;
+        }
+        
+        .completed-time {
+            font-size: 14px;
+            color: #888;
+            margin-right: 10px;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .input-section {
+            margin-top: 30px;
+            text-align: center;
+            display: none; /* 在"已完成"标签页隐藏 */
+        }
+        
+        .input-section.visible {
+            display: block;
+        }
+        
+        #new-item-input {
+            width: 70%;
+            height: 30px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        #add-button {
+            margin-left: 10px;
+            padding: 6px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        #add-button:hover {
+            background-color: #45a049;
+        }
+        
+        .drag-over {
+            background-color: #e6f7ff;
+            border: 2px dashed #0088cc;
+        }
+        
+        /* 设置页面样式 */
+        .settings-section {
+            margin-top: 20px;
+        }
+        
+        .settings-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .settings-section button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .settings-section button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .settings-section input[type="file"] {
+            margin-top: 10px;
+        }
+        
+        .export-section {
+            margin-top: 20px;
+        }
+        
+        .export-section p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>四象限图</h1>
+        
+        <div class="tabs">
+            <div class="tab active" id="todo-tab">待办</div>
+            <div class="tab" id="completed-tab">已完成</div>
+            <div class="tab" id="settings-tab">设置</div>
+        </div>
+        
+        <div class="tab-content active" id="todo-content">
+            <div class="quadrant-grid">
+                <div class="quadrant important-not-urgent" data-quadrant="important-not-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" data-quadrant="important-not-urgent"></div>
+                        重要&不紧急
+                    </div>
+                    <ul class="item-list" id="important-not-urgent-todo">
+                        <!-- 待办事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant important-urgent" data-quadrant="important-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" data-quadrant="important-urgent"></div>
+                        重要&紧急
+                    </div>
+                    <ul class="item-list" id="important-urgent-todo">
+                        <!-- 待办事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant not-important-not-urgent" data-quadrant="not-important-not-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" data-quadrant="not-important-not-urgent"></div>
+                        不重要&不紧急
+                    </div>
+                    <ul class="item-list" id="not-important-not-urgent-todo">
+                        <!-- 待办事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant not-important-urgent" data-quadrant="not-important-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" data-quadrant="not-important-urgent"></div>
+                        不重要&紧急
+                    </div>
+                    <ul class="item-list" id="not-important-urgent-todo">
+                        <!-- 待办事项将在这里动态添加 -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="completed-content">
+            <div class="quadrant-grid">
+                <div class="quadrant important-not-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" style="visibility:hidden;"></div>
+                        重要&不紧急
+                    </div>
+                    <ul class="item-list" id="important-not-urgent-completed">
+                        <!-- 已完成事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant important-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" style="visibility:hidden;"></div>
+                        重要&紧急
+                    </div>
+                    <ul class="item-list" id="important-urgent-completed">
+                        <!-- 已完成事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant not-important-not-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" style="visibility:hidden;"></div>
+                        不重要&不紧急
+                    </div>
+                    <ul class="item-list" id="not-important-not-urgent-completed">
+                        <!-- 已完成事项将在这里动态添加 -->
+                    </ul>
+                </div>
+                <div class="quadrant not-important-urgent">
+                    <div class="quadrant-header">
+                        <div class="quadrant-selector" style="visibility:hidden;"></div>
+                        不重要&紧急
+                    </div>
+                    <ul class="item-list" id="not-important-urgent-completed">
+                        <!-- 已完成事项将在这里动态添加 -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="settings-content">
+            <div class="settings-section">
+                <h3>数据导出</h3>
+                <div class="export-section">
+                    <button id="export-data-btn">导出数据</button>
+                    <p>点击按钮下载当前数据的备份文件</p>
+                </div>
+				<br>
+				<h3>数据导入</h3>
+                <div class="import-section">
+                    <button id="import-data-btn">选择文件导入</button>
+                    <input type="file" id="import-file" accept=".json">
+                    <p>选择之前导出的JSON文件进行数据导入</p>
+                </div>
+				<br>
+				<h3>数据删除</h3>
+                <div class="clear-section">
+                    <button id="clear-all-data-btn">清空所有数据</button>
+                    <p>警告：此操作将删除所有待办和已完成的事项</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section visible" id="input-section">
+            <input type="text" id="new-item-input" placeholder="输入新的待办事项...">
+            <button id="add-button">添加</button>
+        </div>
+    </div>
+
+    <script>
+        // 用于存储四象限的待办和已完成事项
+        let tasks = JSON.parse(localStorage.getItem('quadrantTasks')) || {
+            'important-not-urgent': { todo: [], completed: [] },
+            'important-urgent': { todo: [], completed: [] },
+            'not-important-not-urgent': { todo: [], completed: [] },
+            'not-important-urgent': { todo: [], completed: [] }
+        };
+
+        // DOM元素
+        const todoTab = document.getElementById('todo-tab');
+        const completedTab = document.getElementById('completed-tab');
+        const settingsTab = document.getElementById('settings-tab');
+        const todoContent = document.getElementById('todo-content');
+        const completedContent = document.getElementById('completed-content');
+        const settingsContent = document.getElementById('settings-content');
+        const newItemInput = document.getElementById('new-item-input');
+        const addButton = document.getElementById('add-button');
+        const inputSection = document.getElementById('input-section');
+        const quadrantSelectors = document.querySelectorAll('.quadrant-selector');
+        
+        // 设置页面相关元素
+        const exportDataBtn = document.getElementById('export-data-btn');
+        const importDataBtn = document.getElementById('import-data-btn');
+        const importFileInput = document.getElementById('import-file');
+        const clearAllDataBtn = document.getElementById('clear-all-data-btn');
+        
+        let selectedQuadrant = null;
+
+        // 初始化应用
+        function init() {
+            renderAllLists();
+            setupEventListeners();
+            updateQuadrantSelection();
+        }
+
+        // 渲染所有列表
+        function renderAllLists() {
+            renderQuadrantList('important-not-urgent', 'todo');
+            renderQuadrantList('important-urgent', 'todo');
+            renderQuadrantList('not-important-not-urgent', 'todo');
+            renderQuadrantList('not-important-urgent', 'todo');
+            
+            renderQuadrantList('important-not-urgent', 'completed');
+            renderQuadrantList('important-urgent', 'completed');
+            renderQuadrantList('not-important-not-urgent', 'completed');
+            renderQuadrantList('not-important-urgent', 'completed');
+        }
+
+        // 渲染特定象限的列表
+        function renderQuadrantList(quadrant, status) {
+            const listId = `${quadrant}-${status}`;
+            const list = document.getElementById(listId);
+            if (!list) return;
+            
+            list.innerHTML = '';
+            const items = tasks[quadrant][status];
+            
+            // 限制最多显示6条，超出部分不显示
+            const itemsToShow = items.slice(0, 6);
+            
+            itemsToShow.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'item';
+                if (status === 'completed') {
+                    li.classList.add('completed');
+                }
+                
+                if (status === 'todo') {
+                    li.draggable = true;
+                    li.dataset.index = index;
+                    li.dataset.quadrant = quadrant;
+                    li.dataset.status = status;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'item-checkbox';
+                    checkbox.checked = false;
+                    
+                    const span = document.createElement('span');
+                    span.className = 'item-text';
+                    span.textContent = item.text;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '删除';
+                    deleteBtn.addEventListener('click', () => deleteItem(quadrant, status, index));
+                    
+                    checkbox.addEventListener('change', () => toggleCompleted(quadrant, index));
+                    
+                    // 拖拽事件
+                    li.addEventListener('dragstart', handleDragStart);
+                    li.addEventListener('dragover', handleDragOver);
+                    li.addEventListener('drop', handleDrop);
+                    li.addEventListener('dragend', handleDragEnd);
+                    
+                    li.appendChild(checkbox);
+                    li.appendChild(span);
+                    li.appendChild(deleteBtn);
+                } else {
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'completed-time';
+                    timeSpan.textContent = formatShortDateTime(item.completedTime);
+                    
+                    const span = document.createElement('span');
+                    span.className = 'item-text';
+                    span.textContent = item.text;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '删除';
+                    deleteBtn.addEventListener('click', () => deleteItem(quadrant, status, index));
+                    
+                    li.appendChild(timeSpan);
+                    li.appendChild(span);
+                    li.appendChild(deleteBtn);
+                }
+                
+                list.appendChild(li);
+            });
+            
+            // 如果超出6条，添加提示信息
+            if (items.length > 6) {
+                const moreLi = document.createElement('li');
+                moreLi.className = 'item';
+                moreLi.style.backgroundColor = '#f0f0f0';
+                moreLi.style.textAlign = 'center';
+                moreLi.style.fontSize = '14px';
+                moreLi.style.color = '#888';
+                moreLi.textContent = `还有 ${items.length - 6} 条...`;
+                list.appendChild(moreLi);
+            }
+        }
+
+        // 格式化短日期时间格式 (YY-MM-DD HH:MM)
+        function formatShortDateTime(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const year = date.getFullYear().toString().slice(-2);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+        // 切换事项完成状态
+        function toggleCompleted(quadrant, index) {
+            const item = tasks[quadrant].todo[index];
+            if (!item) return;
+            
+            // 移除待办列表中的项目
+            tasks[quadrant].todo.splice(index, 1);
+            
+            // 添加到已完成列表
+            tasks[quadrant].completed.push({
+                text: item.text,
+                completedTime: new Date().toISOString()
+            });
+            
+            // 保存到本地存储
+            saveToLocalStorage();
+            
+            // 重新渲染列表
+            renderQuadrantList(quadrant, 'todo');
+            renderQuadrantList(quadrant, 'completed');
+        }
+
+        // 删除事项
+        function deleteItem(quadrant, status, index) {
+            tasks[quadrant][status].splice(index, 1);
+            saveToLocalStorage();
+            renderQuadrantList(quadrant, status);
+        }
+
+        // 添加新事项
+        function addNewItem() {
+            const text = newItemInput.value.trim();
+            if (!text) {
+                alert('请输入任务内容');
+                return;
+            }
+            
+            if (!selectedQuadrant) {
+                alert('请选择任务象限');
+                return;
+            }
+            
+            tasks[selectedQuadrant].todo.push({
+                text: text,
+                completed: false
+            });
+            
+            saveToLocalStorage();
+            renderQuadrantList(selectedQuadrant, 'todo');
+            newItemInput.value = '';
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('quadrantTasks', JSON.stringify(tasks));
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 标签页切换
+            todoTab.addEventListener('click', () => switchTab('todo'));
+            completedTab.addEventListener('click', () => switchTab('completed'));
+            settingsTab.addEventListener('click', () => switchTab('settings'));
+            
+            // 添加按钮点击事件
+            addButton.addEventListener('click', addNewItem);
+            
+            // 输入框回车事件
+            newItemInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addNewItem();
+                }
+            });
+            
+            // 象限选择器事件
+            quadrantSelectors.forEach(selector => {
+                selector.addEventListener('click', () => {
+                    const quadrant = selector.getAttribute('data-quadrant');
+                    setSelectedQuadrant(quadrant);
+                });
+            });
+            
+            // 数据导出事件
+            exportDataBtn.addEventListener('click', exportData);
+            
+            // 数据导入事件
+            importFileInput.addEventListener('change', handleFileImport);
+            
+            // 清空数据事件
+            clearAllDataBtn.addEventListener('click', clearAllData);
+        }
+
+        // 设置选中的象限
+        function setSelectedQuadrant(quadrant) {
+            selectedQuadrant = quadrant;
+            updateQuadrantSelection();
+        }
+
+        // 更新象限选择的UI
+        function updateQuadrantSelection() {
+            quadrantSelectors.forEach(selector => {
+                const quadrant = selector.getAttribute('data-quadrant');
+                if (quadrant === selectedQuadrant) {
+                    selector.classList.add('selected');
+                } else {
+                    selector.classList.remove('selected');
+                }
+            });
+        }
+
+        // 切换标签页
+        function switchTab(tabName) {
+            // 移除所有活动标签页的active类
+            todoTab.classList.remove('active');
+            completedTab.classList.remove('active');
+            settingsTab.classList.remove('active');
+            
+            // 隐藏所有内容区域
+            todoContent.classList.remove('active');
+            completedContent.classList.remove('active');
+            settingsContent.classList.remove('active');
+            
+            // 根据选择的标签页设置样式
+            if (tabName === 'todo') {
+                todoTab.classList.add('active');
+                todoContent.classList.add('active');
+                inputSection.classList.add('visible');
+            } else if (tabName === 'completed') {
+                completedTab.classList.add('active');
+                completedContent.classList.add('active');
+                inputSection.classList.remove('visible');
+            } else if (tabName === 'settings') {
+                settingsTab.classList.add('active');
+                settingsContent.classList.add('active');
+                inputSection.classList.remove('visible');
+            }
+        }
+
+        // 拖拽相关函数
+        let dragSrcEl = null;
+
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
+            this.classList.remove('drag-over');
+            
+            if (dragSrcEl !== this) {
+                // 获取拖拽源和目标的象限和索引
+                const srcQuadrant = dragSrcEl.dataset.quadrant;
+                const srcIndex = parseInt(dragSrcEl.dataset.index);
+                
+                if (!isNaN(srcIndex) && srcQuadrant) {
+                    // 由于我们只在同一个列表内拖拽，这里简单地交换位置
+                    // 如果需要跨列表拖拽，需要额外的逻辑
+                    const srcItem = tasks[srcQuadrant].todo[srcIndex];
+                    if (srcItem) {
+                        // 重新排序 - 这里简化处理，实际上需要更复杂的逻辑来处理拖拽排序
+                        // 为了演示，我们只是重新渲染列表
+                        renderQuadrantList(srcQuadrant, 'todo');
+                    }
+                }
+            }
+            return false;
+        }
+
+        function handleDragEnd() {
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+
+        // 导出数据
+        function exportData() {
+            const data = {
+                tasks: tasks,
+                exportTime: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = '四象限图数据备份.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // 处理文件导入
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.tasks) {
+                        // 验证数据格式
+                        if (typeof data.tasks === 'object') {
+                            tasks = data.tasks;
+                            
+                            // 保存到本地存储
+                            saveToLocalStorage();
+                            
+                            // 重新渲染列表
+                            renderAllLists();
+                            
+                            alert('数据导入成功！');
+                            
+                            // 清空文件输入框
+                            importFileInput.value = '';
+                            
+                            // 切换到待办标签页
+                            switchTab('todo');
+                        } else {
+                            throw new Error('数据格式不正确');
+                        }
+                    } else {
+                        throw new Error('文件内容不符合要求');
+                    }
+                } catch (error) {
+                    alert('导入失败：' + error.message);
+                    console.error('导入数据时出错：', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                tasks = {
+                    'important-not-urgent': { todo: [], completed: [] },
+                    'important-urgent': { todo: [], completed: [] },
+                    'not-important-not-urgent': { todo: [], completed: [] },
+                    'not-important-urgent': { todo: [], completed: [] }
+                };
+                
+                saveToLocalStorage();
+                renderAllLists();
+                
+                alert('所有数据已清空');
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

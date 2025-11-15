@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>时间管理三工具</title>
+<style>
+  :root {
+    --primary-color: #2c3e50;
+    --secondary-color: #ecf0f1;
+    --accent-color: #3498db;
+    --text-color: #2c3e50;
+    --bg-color: #ffffff;
+    --border-color: #bdc3c7;
+    --shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f7fa;
+    color: var(--text-color);
+    line-height: 1.6;
+    padding: 0;
+    margin: 0;
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    background-color: var(--bg-color);
+    margin: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primary-color), #4a6fa5);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  nav {
+    display: flex;
+    background-color: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+
+  nav button {
+    flex: 1;
+    padding: 15px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    outline: none;
+    position: relative;
+  }
+
+  nav button:hover {
+    background-color: rgba(0,0,0,0.05);
+  }
+
+  nav button.active {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+
+  nav button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--accent-color);
+  }
+
+  main {
+    flex-grow: 1;
+    overflow: hidden; /* Contain iframe scroll */
+    padding: 0; /* Reset padding */
+  }
+
+  #tool-frame {
+    width: 100%;
+    height: 100%;
+    border: none; /* Remove default border */
+  }
+
+  footer {
+    text-align: center;
+    padding: 0.8rem;
+    background-color: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    nav {
+      flex-wrap: wrap;
+    }
+    nav button {
+       flex: 1 0 50%; /* Two buttons per row on small screens */
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <h1>🛠️ 简明三工具</h1>
+  </header>
+
+  <nav id="main-nav">
+    <button class="nav-btn active" data-src="事件收集箱.html">📝 事件收集箱</button>
+    <button class="nav-btn" data-src="四象限图.html">📊 四象限图</button>
+    <button class="nav-btn" data-src="日志记录系统.html">📔 日志记录系统</button>
+  </nav>
+
+  <main>
+    <iframe id="tool-frame" src="事件收集箱.html" title="工具面板"></iframe>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 一只鱼的工具箱</p>
+  </footer>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const navButtons = document.querySelectorAll('#main-nav .nav-btn');
+    const toolFrame = document.getElementById('tool-frame');
+
+    navButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Update active state
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        // Load the selected tool
+        const src = button.getAttribute('data-src');
+        toolFrame.src = src;
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
