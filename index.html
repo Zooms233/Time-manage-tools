@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>时间管理三工具</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
   :root {
     --primary-color: #2c3e50;
@@ -28,7 +27,6 @@
     line-height: 1.6;
     padding: 0;
     margin: 0;
-    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
   }
 
   .app-container {
@@ -118,55 +116,12 @@
     flex-shrink: 0;
   }
 
-  /* 移动端适配 */
   @media (max-width: 768px) {
-    .app-container {
-      margin: 0;
-      border-radius: 0;
-      height: 100vh;
-    }
-    
-    header h1 {
-      font-size: 1.3rem;
-    }
-    
     nav {
       flex-wrap: wrap;
     }
-    
     nav button {
-      flex: 1 0 33.333%; /* 三按钮在一行显示，避免换行 */
-      font-size: 0.9rem;
-      padding: 12px 5px;
-    }
-    
-    /* 在更小的屏幕上调整为两行 */
-    @media (max-width: 480px) {
-      nav {
-        flex-direction: column;
-      }
-      
-      nav button {
-        flex: 1 0 auto;
-        border-bottom: 1px solid var(--border-color);
-      }
-    }
-    
-    footer {
-      font-size: 0.8rem;
-      padding: 0.6rem;
-    }
-  }
-  
-  /* 针对非常小的屏幕优化 */
-  @media (max-width: 320px) {
-    header h1 {
-      font-size: 1.2rem;
-    }
-    
-    nav button {
-      font-size: 0.8rem;
-      padding: 10px 5px;
+       flex: 1 0 50%; /* Two buttons per row on small screens */
     }
   }
 </style>
@@ -208,22 +163,6 @@
         const src = button.getAttribute('data-src');
         toolFrame.src = src;
       });
-    });
-    
-    // 防止iframe内部页面滚动影响主页面
-    toolFrame.addEventListener('load', () => {
-      try {
-        const iframeDoc = toolFrame.contentDocument || toolFrame.contentWindow.document;
-        const style = iframeDoc.createElement('style');
-        style.textContent = `
-          body {
-            -webkit-overflow-scrolling: touch;
-          }
-        `;
-        iframeDoc.head.appendChild(style);
-      } catch(e) {
-        // 忽略跨域错误
-      }
     });
   });
 </script>
