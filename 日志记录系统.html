@@ -2,241 +2,299 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日志记录系统</title>
     <style>
-        * {
-            box-sizing: border-box;
-            /* 防止页面在移动端被意外拖拽 */
-            touch-action: manipulation;
-        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #333;
-            font-size: 16px; /* 增大基础字体 */
-            line-height: 1.5;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
+        
         .container {
-            /* 移除固定max-width，让内容撑满 */
+            max-width: 600px;
             margin: 0 auto;
-            background-color: #fff;
-            padding: 15px; /* 减小内边距 */
-            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
-            min-height: 100vh; /* 确保容器至少占满屏幕 */
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
         }
+        
         h1 {
             text-align: center;
+            font-size: 24px;
+            margin-top: 0;
             color: #333;
-            font-size: 1.5rem; /* 响应式标题大小 */
-            margin-top: 10px;
-            margin-bottom: 20px;
         }
-        .nav {
+        
+        .tabs {
             display: flex;
-            justify-content: center;
             margin-bottom: 20px;
-            gap: 8px; /* 减小按钮间距 */
-            flex-wrap: nowrap; /* 防止换行 */
+            border-bottom: 1px solid #ddd;
         }
-        .nav button {
-            flex: 1; /* 平均分配宽度 */
-            padding: 12px 5px; /* 增大触摸区域 */
-            border: none;
-            border-radius: 6px; /* 稍大圆角 */
-            background-color: #e4e6eb;
+        
+        .tab {
+            padding: 10px 20px;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            white-space: nowrap;
-            font-size: 0.9rem; /* 稍小字体 */
-            color: #4b4f56;
-            font-weight: 500;
-            /* 移除outline可能影响视觉，但保留键盘焦点 */
-            outline: none;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
         }
-        .nav button:focus {
-            /* 为键盘导航用户提供焦点指示 */
-            box-shadow: 0 0 0 2px #42b549;
-        }
-        .nav button:hover {
-            background-color: #d8dadf;
-        }
-        .nav button:active {
-            background-color: #ccd0d5;
-            transform: scale(0.98); /* 点击时轻微缩小 */
-        }
-        .nav button.active {
-            background-color: #42b549;
+        
+        .tab.active {
+            background-color: #4CAF50;
             color: white;
         }
-        .view {
+        
+        .tab-content {
             display: none;
         }
-        .view.active {
+        
+        .tab-content.active {
             display: block;
         }
+        
         .form-group {
-            margin-bottom: 18px; /* 增大表单项间距 */
+            margin-bottom: 15px;
         }
+        
         label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 600; /* 稍粗字体 */
-            color: #4b4f56;
-            font-size: 0.95rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
+        
         input[type="date"], textarea {
             width: 100%;
-            padding: 12px; /* 增大输入框内边距 */
-            border: 1px solid #ccd0d5;
-            border-radius: 6px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
             box-sizing: border-box;
-            font-size: 1rem; /* 输入框字体大小 */
-            background-color: #f0f2f5;
         }
-        input[type="date"]:focus, textarea:focus {
-            border-color: #42b549;
-            background-color: #fff;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(66, 181, 73, 0.2);
-        }
+        
         textarea {
-            height: 100px; /* 增加文本域高度 */
+            height: 80px;
             resize: vertical;
-            min-height: 80px; /* 设置最小高度 */
         }
+        
         .button-group {
             display: flex;
-            gap: 12px; /* 增大按钮间距 */
-            margin-top: 25px;
+            gap: 10px;
+            margin-top: 15px;
         }
+        
         .button-group button {
             flex: 1;
-            padding: 15px; /* 增大按钮内边距 */
+            padding: 10px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 1.1rem; /* 增大按钮字体 */
-            font-weight: 600;
-            transition: background-color 0.2s, transform 0.1s;
-            outline: none;
+            font-size: 14px;
+            font-weight: bold;
         }
-        .button-group button:focus {
-            box-shadow: 0 0 0 2px #42b549;
-        }
-        .button-group button:active {
-           transform: scale(0.98);
-        }
-        .button-group .add-btn {
-            background-color: #42b549; /* 绿色 */
+        
+        .add-btn {
+            background-color: #4CAF50;
             color: white;
         }
-        .button-group .overwrite-btn {
-            background-color: #ff9500; /* 橙色 */
-            color: white;
+        
+        .add-btn:hover {
+            background-color: #45a049;
         }
-        .button-group .add-btn:hover {
-            background-color: #369c3c;
-        }
-        .button-group .overwrite-btn:hover {
-            background-color: #e68600;
-        }
-
-        /* 设置界面样式 */
-        .settings-section {
-            margin-bottom: 25px;
-        }
-        .settings-section h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #4b4f56;
-            font-size: 1.2rem;
-        }
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%; /* 让文件输入按钮撑满 */
-            margin-bottom: 15px;
-        }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        .file-input-button {
-            display: block; /* 改为块级元素 */
-            width: 100%;
-            padding: 15px;
-            background-color: #2196F3;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        .file-input-button:hover {
-            background-color: #0b7dda;
-        }
-        button.export-btn, button.clear-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: 15px;
-            outline: none;
-        }
-        button.export-btn:focus, button.clear-btn:focus {
-            box-shadow: 0 0 0 2px #42b549;
-        }
-        button.export-btn {
+        
+        .overwrite-btn {
             background-color: #ff9500;
             color: white;
         }
-        button.export-btn:hover {
+        
+        .overwrite-btn:hover {
             background-color: #e68600;
         }
-        button.clear-btn {
-             background-color: #ff3b30;
-             color: white;
+        
+        .log-list {
+            list-style-type: none;
+            padding: 0;
         }
-        button.clear-btn:hover {
+        
+        .log-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .log-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .log-date {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 80px;
+        }
+        
+        .log-content {
+            flex-grow: 1;
+            font-size: 14px;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .delete-btn:hover {
             background-color: #d32f2f;
         }
-
-        /* 预览界面样式 */
+        
+        .input-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        #new-item-input {
+            width: 70%;
+            height: 30px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        #add-button {
+            margin-left: 10px;
+            padding: 6px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        #add-button:hover {
+            background-color: #45a049;
+        }
+        
+        .drag-over {
+            background-color: #e6f7ff;
+            border: 2px dashed #0088cc;
+        }
+        
+        /* 隐藏已完成页面的输入框 */
+        #completed-content .input-section {
+            display: none;
+        }
+        
+        /* 设置页面样式 */
+        .settings-section {
+            margin-top: 20px;
+        }
+        
+        .settings-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .settings-section button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .settings-section button:hover {
+            background-color: #0b7dda;
+        }
+        
+        .settings-section input[type="file"] {
+            margin-top: 10px;
+            display: none; /* 默认隐藏文件输入框 */
+        }
+        
+        .export-section {
+            margin-top: 20px;
+        }
+        
+        .export-section p {
+            margin: 5px 0;
+        }
+        
+        /* 状态信息样式 */
+        .status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none; /* 默认隐藏状态信息 */
+        }
+        
+        .status-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* 预览表格样式 */
         .preview-container {
-            max-height: 60vh; /* 使用视口高度 */
+            max-height: 400px;
             overflow-y: auto;
             margin-top: 15px;
             border: 1px solid #ccd0d5;
             border-radius: 6px;
             background-color: #f8f9fa;
         }
+        
         table {
             width: 100%;
             border-collapse: collapse;
         }
+        
         th, td {
             border: 1px solid #ccd0d5;
-            padding: 12px 8px; /* 调整内边距 */
+            padding: 10px 8px;
             text-align: left;
             vertical-align: top;
-            font-size: 0.85rem; /* 稍小字体 */
+            font-size: 0.85rem;
         }
+        
         th {
             background-color: #e4e6eb;
             position: sticky;
@@ -244,521 +302,508 @@
             z-index: 10;
             font-weight: 600;
         }
+        
         tr:nth-child(even){background-color: #f8f9fa;}
         tr:hover { background-color: #eff1f3; }
-
-        /* 状态信息样式 */
-        .status {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        .status-info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        .status-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        .status-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* 针对非常小的屏幕进行微调 */
-        @media (max-width: 350px) {
-            .container {
-                padding: 10px;
-            }
-            .nav button {
-                padding: 10px 3px;
-                font-size: 0.8rem;
-            }
-            .button-group button {
-                padding: 12px;
-                font-size: 1rem;
-            }
-        }
     </style>
 </head>
 <body>
-
-<div class="container">
-
-    <h1>日志记录系统</h1>
-
-    <!-- 导航栏 -->
-    <div class="nav">
-        <button class="nav-btn active" onclick="showView('mainView')">主界面</button>
-        <button class="nav-btn" onclick="showView('previewView')">预览界面</button>
-        <button class="nav-btn" onclick="showView('settingsView')">设置</button>
-    </div>
-
-    <!-- 主界面 -->
-    <div id="mainView" class="view active">
-        <form id="logForm">
-            <div class="form-group">
-                <label for="logDate">日期</label>
-                <input type="date" id="logDate" name="logDate" required>
-            </div>
-            <div class="form-group">
-                <label for="happy">快乐</label>
-                <textarea id="happy" name="happy" placeholder="今天有什么让你感到快乐的事情？"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="fulfilled">充实</label>
-                <textarea id="fulfilled" name="fulfilled" placeholder="今天做了哪些让你感到充实的事情？"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="improve">改进</label>
-                <textarea id="improve" name="improve" placeholder="今天有哪些地方可以改进？"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="grateful">感谢</label>
-                <textarea id="grateful" name="grateful" placeholder="今天你感谢什么人或事？"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="think">思考</label>
-                <textarea id="think" name="think" placeholder="今天的思考和感悟是什么？"></textarea>
-            </div>
-            <div class="button-group">
-                <button type="button" class="add-btn" onclick="saveLog('add')">新增</button>
-                <button type="button" class="overwrite-btn" onclick="saveLog('overwrite')">覆盖</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- 预览界面 -->
-    <div id="previewView" class="view">
-        <h2>日志预览</h2>
-        <div class="preview-container">
-            <table id="logTable">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">日期</th>
-                        <th style="width: 17%;">快乐</th>
-                        <th style="width: 17%;">充实</th>
-                        <th style="width: 17%;">改进</th>
-                        <th style="width: 17%;">感谢</th>
-                        <th style="width: 17%;">思考</th>
-                    </tr>
-                </thead>
-                <tbody id="logTableBody">
-                    <!-- 日志内容将通过JavaScript动态加载到这里 -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- 设置界面 -->
-    <div id="settingsView" class="view">
-        <h2>数据管理</h2>
+    <div class="container">
+        <h1>日志记录系统</h1>
         
-        <div class="settings-section">
-            <h3>导入数据</h3>
-            <div class="file-input-wrapper">
-                <span class="file-input-button">选择CSV文件</span>
-                <input type="file" id="importFile" accept=".csv" onchange="importCSV(event)">
-            </div>
-            <div id="importStatus" class="status" style="display:none;"></div>
-            <p><small>
-			导入格式:
-				表头:date,happy,fulfilled,improve,grateful,think<br>
-				其中data数据列日期格式：yyyy.mm.dd<br>
-			注意：导入具有相同日期的新记录时，新内容将追加到现有内容之后（用逗号和空格分隔）。</small></p>
+        <div class="tabs">
+            <div class="tab active" id="main-tab">主界面</div>
+            <div class="tab" id="preview-tab">预览界面</div>
+            <div class="tab" id="settings-tab">设置</div>
         </div>
         
-        <div class="settings-section">
-            <h3>导出与清空</h3>
-            <button class="export-btn" onclick="exportCSV()">导出CSV</button>
-            <button class="clear-btn" onclick="clearAllLogs()">清空所有记录</button>
-            <div id="exportStatus" class="status" style="display:none;"></div>
-            <div id="clearStatus" class="status" style="display:none;"></div>
-            <p><small><strong>警告:</strong> 
-			数据存储在浏览器缓存中，在清理浏览器数据时注意导出数据记录。<br>
-			“清空所有记录”操作不可逆。请在执行前确认已导出重要数据。</small></p>
+        <div class="tab-content active" id="main-content">
+            <form id="logForm">
+                <div class="form-group">
+                    <label for="logDate">日期</label>
+                    <input type="date" id="logDate" name="logDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="happy">快乐</label>
+                    <textarea id="happy" name="happy" placeholder="今天有什么让你感到快乐的事情？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="fulfilled">充实</label>
+                    <textarea id="fulfilled" name="fulfilled" placeholder="今天做了哪些让你感到充实的事情？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="improve">改进</label>
+                    <textarea id="improve" name="improve" placeholder="今天有哪些地方可以改进？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="grateful">感谢</label>
+                    <textarea id="grateful" name="grateful" placeholder="今天你感谢什么人或事？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="think">思考</label>
+                    <textarea id="think" name="think" placeholder="今天的思考和感悟是什么？"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="add-btn" onclick="saveLog('add')">新增</button>
+                    <button type="button" class="overwrite-btn" onclick="saveLog('overwrite')">覆盖</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="tab-content" id="preview-content">
+            <h2>日志预览</h2>
+            <div class="preview-container">
+                <table id="logTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">日期</th>
+                            <th style="width: 17%;">快乐</th>
+                            <th style="width: 17%;">充实</th>
+                            <th style="width: 17%;">改进</th>
+                            <th style="width: 17%;">感谢</th>
+                            <th style="width: 17%;">思考</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody">
+                        <!-- 日志内容将通过JavaScript动态加载到这里 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="settings-content">
+            <div class="settings-section">
+                <h3>数据导出</h3>
+                <div class="export-section">
+                    <button id="export-data-btn" onclick="exportCSV()">导出数据</button>
+                    <p>点击按钮下载当前数据的备份文件</p>
+                    <div id="exportStatus" class="status"></div>
+                </div>
+                <br>
+                <h3>数据导入</h3>
+                <div class="import-section">
+                    <button id="select-file-btn" onclick="document.getElementById('import-file').click();">选择文件</button>
+					<p>选择之前导出的CSV文件进行数据导入</p>
+					<p>导入格式: 表头:date,happy,fulfilled,improve,grateful,think</p>
+					<p>其中data数据列日期格式：yyyy.mm.dd</p>
+					<p>导入具有相同日期的新记录时，新内容将追加到现有内容之后（用,分隔）</p>
+                    <button id="execute-import-btn" onclick="executeImport()">执行导入</button>
+                    <input type="file" id="import-file" accept=".csv">
+                    <p>先点击 "选择文件" 按钮选择CSV文件，再点击 "执行导入" 按钮。</p>
+                    <div id="importStatus" class="status"></div>
+                    <div id="selectedFileName" style="margin-top: 5px; font-size: 0.9em; color: #666;"></div>
+                </div>
+                <br>
+                <h3>数据删除</h3>
+                <div class="clear-section">
+                    <button id="clear-all-data-btn" onclick="clearAllLogs()">清空所有数据</button>
+                    <p>警告：此操作将删除所有日志记录</p>
+					<p>所有数据均存储在浏览器缓存中，清除浏览器记录前注意导出</p>
+                    <div id="clearStatus" class="status"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-</div>
+    <script>
+        // --- 数据存储 (使用 localStorage 模拟) ---
+        const STORAGE_KEY = 'dailyLogs';
+        let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-<script>
-    // --- 数据存储 (使用 localStorage 模拟) ---
-    const STORAGE_KEY = 'dailyLogs';
-    let logs = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        // --- 视图切换逻辑 ---
+        function showView(viewId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(viewId.replace('tab', 'content')).classList.add('active');
 
-    // --- 视图切换逻辑 ---
-    function showView(viewId) {
-        document.querySelectorAll('.view').forEach(view => {
-            view.classList.remove('active');
-        });
-        document.getElementById(viewId).classList.add('active');
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        if (viewId === 'mainView') {
-            document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
-            // 设置日期输入框默认值为当前日期
-            document.getElementById('logDate').valueAsDate = new Date();
-        }
-        else if (viewId === 'previewView') {
-            document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
-            loadPreviewData();
-        }
-        else if (viewId === 'settingsView') document.querySelector('.nav-btn:nth-child(3)').classList.add('active');
-    }
-
-    // --- 主界面功能 ---
-    function getCurrentDateStr() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    // 修改 saveLog 函数以支持 'add' 和 'overwrite' 模式
-    function saveLog(mode) {
-        const dateInput = document.getElementById('logDate');
-        const date = dateInput.value;
-        const happy = document.getElementById('happy').value.trim();
-        const fulfilled = document.getElementById('fulfilled').value.trim();
-        const improve = document.getElementById('improve').value.trim();
-        const grateful = document.getElementById('grateful').value.trim();
-        const think = document.getElementById('think').value.trim();
-
-        if (!date) {
-             alert('请选择日期。');
-             return;
-        }
-
-        // 简单验证（可以更复杂）
-        if (!happy && !fulfilled && !improve && !grateful && !think) {
-            alert('请至少填写一项内容。');
-            return;
-        }
-
-        const newEntry = { date, happy, fulfilled, improve, grateful, think };
-        const existingIndex = logs.findIndex(log => log.date === date);
-
-        if (mode === 'overwrite') {
-            // 覆盖模式：直接替换或添加
-            if (existingIndex > -1) {
-                logs[existingIndex] = newEntry;
-            } else {
-                logs.push(newEntry);
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (viewId === 'main-tab') {
+                document.getElementById('main-tab').classList.add('active');
+                // 设置日期输入框默认值为当前日期
+                document.getElementById('logDate').valueAsDate = new Date();
             }
-            showStatus('exportStatus', 'success', `日志已覆盖保存至 ${date}`);
-        } else if (mode === 'add') {
-            // 新增模式：合并或添加
-            if (existingIndex > -1) {
-                 // 合并逻辑：只更新非空字段，保留原有非空字段
-                const existingEntry = logs[existingIndex];
-                const mergedEntry = {
-                    date: date, // 日期不变
-                    happy: happy || existingEntry.happy, // 新的不为空则用新的，否则保留旧的
-                    fulfilled: fulfilled || existingEntry.fulfilled,
-                    improve: improve || existingEntry.improve,
-                    grateful: grateful || existingEntry.grateful,
-                    think: think || existingEntry.think
-                };
-                // 处理追加逻辑：如果新旧都非空，则追加
-                const appendIfNotEmpty = (oldVal, newVal) => {
-                     if (oldVal && newVal) {
-                         return oldVal + ', ' + newVal;
-                     }
-                     return oldVal || newVal || ''; // 如果有一个为空，则返回非空的那个，或空字符串
-                };
-                mergedEntry.happy = appendIfNotEmpty(existingEntry.happy, happy);
-                mergedEntry.fulfilled = appendIfNotEmpty(existingEntry.fulfilled, fulfilled);
-                mergedEntry.improve = appendIfNotEmpty(existingEntry.improve, improve);
-                mergedEntry.grateful = appendIfNotEmpty(existingEntry.grateful, grateful);
-                mergedEntry.think = appendIfNotEmpty(existingEntry.think, think);
-
-                logs[existingIndex] = mergedEntry;
-            } else {
-                // 如果日期不存在，则直接添加新条目
-                logs.push(newEntry);
+            else if (viewId === 'preview-tab') {
+                document.getElementById('preview-tab').classList.add('active');
+                loadPreviewData();
             }
-            showStatus('exportStatus', 'success', `日志已新增/合并至 ${date}`);
+            else if (viewId === 'settings-tab') {
+                document.getElementById('settings-tab').classList.add('active');
+                // 清除上一次的文件选择状态
+                selectedFileForImport = null;
+                document.getElementById('selectedFileName').textContent = '';
+            }
         }
 
-        // 保存到 localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+        // 为标签添加点击事件
+        document.getElementById('main-tab').addEventListener('click', () => showView('main-tab'));
+        document.getElementById('preview-tab').addEventListener('click', () => showView('preview-tab'));
+        document.getElementById('settings-tab').addEventListener('click', () => showView('settings-tab'));
 
-        // 清空表单（除了日期）
-        document.getElementById('happy').value = '';
-        document.getElementById('fulfilled').value = '';
-        document.getElementById('improve').value = '';
-        document.getElementById('grateful').value = '';
-        document.getElementById('think').value = '';
-        // 日期保持不变，方便连续输入同一天
-        // document.getElementById('logDate').valueAsDate = new Date(); // 如果需要自动重置日期，取消注释
-    }
-
-    // --- 预览界面功能 ---
-    function loadPreviewData() {
-        const tableBody = document.getElementById('logTableBody');
-        tableBody.innerHTML = '';
-
-        if (logs.length === 0) {
-            const row = tableBody.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 6;
-            cell.textContent = '暂无日志记录。';
-            cell.style.textAlign = 'center';
-            return;
+        // --- 主界面功能 ---
+        function getCurrentDateStr() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
-        const sortedLogs = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
+        // 修改 saveLog 函数以支持 'add' 和 'overwrite' 模式
+        function saveLog(mode) {
+            const dateInput = document.getElementById('logDate');
+            const date = dateInput.value;
+            const happy = document.getElementById('happy').value.trim();
+            const fulfilled = document.getElementById('fulfilled').value.trim();
+            const improve = document.getElementById('improve').value.trim();
+            const grateful = document.getElementById('grateful').value.trim();
+            const think = document.getElementById('think').value.trim();
 
-        sortedLogs.forEach(log => {
-            const row = tableBody.insertRow();
-            row.insertCell(0).textContent = log.date;
-            row.insertCell(1).textContent = log.happy;
-            row.insertCell(2).textContent = log.fulfilled;
-            row.insertCell(3).textContent = log.improve;
-            row.insertCell(4).textContent = log.grateful;
-            row.insertCell(5).textContent = log.think;
+            if (!date) {
+                 alert('请选择日期。');
+                 return;
+            }
+
+            // 简单验证（可以更复杂）
+            if (!happy && !fulfilled && !improve && !grateful && !think) {
+                alert('请至少填写一项内容。');
+                return;
+            }
+
+            const newEntry = { date, happy, fulfilled, improve, grateful, think };
+            const existingIndex = logs.findIndex(log => log.date === date);
+
+            if (mode === 'overwrite') {
+                // 覆盖模式：直接替换或添加
+                if (existingIndex > -1) {
+                    logs[existingIndex] = newEntry;
+                } else {
+                    logs.push(newEntry);
+                }
+                showStatus('exportStatus', 'success', `日志已覆盖保存至 ${date}`);
+            } else if (mode === 'add') {
+                // 新增模式：合并或添加
+                if (existingIndex > -1) {
+                     // 合并逻辑：只更新非空字段，保留原有非空字段
+                    const existingEntry = logs[existingIndex];
+                    const mergedEntry = {
+                        date: date, // 日期不变
+                        happy: happy || existingEntry.happy, // 新的不为空则用新的，否则保留旧的
+                        fulfilled: fulfilled || existingEntry.fulfilled,
+                        improve: improve || existingEntry.improve,
+                        grateful: grateful || existingEntry.grateful,
+                        think: think || existingEntry.think
+                    };
+                    // 处理追加逻辑：如果新旧都非空，则追加
+                    const appendIfNotEmpty = (oldVal, newVal) => {
+                         if (oldVal && newVal) {
+                             return oldVal + ', ' + newVal;
+                         }
+                         return oldVal || newVal || ''; // 如果有一个为空，则返回非空的那个，或空字符串
+                    };
+                    mergedEntry.happy = appendIfNotEmpty(existingEntry.happy, happy);
+                    mergedEntry.fulfilled = appendIfNotEmpty(existingEntry.fulfilled, fulfilled);
+                    mergedEntry.improve = appendIfNotEmpty(existingEntry.improve, improve);
+                    mergedEntry.grateful = appendIfNotEmpty(existingEntry.grateful, grateful);
+                    mergedEntry.think = appendIfNotEmpty(existingEntry.think, think);
+
+                    logs[existingIndex] = mergedEntry;
+                } else {
+                    // 如果日期不存在，则直接添加新条目
+                    logs.push(newEntry);
+                }
+                showStatus('exportStatus', 'success', `日志已新增/合并至 ${date}`);
+            }
+
+            // 保存到 localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+
+            // 清空表单（除了日期）
+            document.getElementById('happy').value = '';
+            document.getElementById('fulfilled').value = '';
+            document.getElementById('improve').value = '';
+            document.getElementById('grateful').value = '';
+            document.getElementById('think').value = '';
+            // 日期保持不变，方便连续输入同一天
+            // document.getElementById('logDate').valueAsDate = new Date(); // 如果需要自动重置日期，取消注释
+        }
+
+        // --- 预览界面功能 ---
+        function loadPreviewData() {
+            const tableBody = document.getElementById('logTableBody');
+            tableBody.innerHTML = '';
+
+            if (logs.length === 0) {
+                const row = tableBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.textContent = '暂无日志记录。';
+                cell.style.textAlign = 'center';
+                return;
+            }
+
+            const sortedLogs = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedLogs.forEach(log => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = log.date;
+                row.insertCell(1).textContent = log.happy;
+                row.insertCell(2).textContent = log.fulfilled;
+                row.insertCell(3).textContent = log.improve;
+                row.insertCell(4).textContent = log.grateful;
+                row.insertCell(5).textContent = log.think;
+            });
+        }
+
+        // --- 设置界面功能 ---
+        function showStatus(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = 'status status-' + type;
+                element.style.display = 'block';
+                // 自动隐藏
+                setTimeout(() => { element.style.display = 'none'; }, 3000);
+            }
+        }
+
+        // 存储用户选择的文件对象
+        let selectedFileForImport = null;
+
+        // 当文件被选中时触发
+        document.getElementById('import-file').addEventListener('change', function(event) {
+             selectedFileForImport = event.target.files[0];
+             const fileNameDisplay = document.getElementById('selectedFileName');
+             if (selectedFileForImport) {
+                  fileNameDisplay.textContent = `已选择文件: ${selectedFileForImport.name}`;
+             } else {
+                  fileNameDisplay.textContent = '';
+             }
         });
-    }
 
-    // --- 设置界面功能 ---
-    function showStatus(elementId, type, message) {
-        const element = document.getElementById(elementId);
-        element.textContent = message;
-        element.className = 'status status-' + type;
-        element.style.display = 'block';
-        // 可选：添加自动隐藏功能
-        // setTimeout(() => { element.style.display = 'none'; }, 5000);
-    }
+        // 执行导入的函数
+        function executeImport() {
+            const statusElementId = 'importStatus';
+            showStatus(statusElementId, 'info', '正在处理文件...');
+            
+            if (!selectedFileForImport) {
+                showStatus(statusElementId, 'warning', '请先选择一个文件。');
+                return;
+            }
+            
+            if (!selectedFileForImport.name.endsWith('.csv')) {
+                showStatus(statusElementId, 'error', '请选择一个 .csv 文件。');
+                return;
+            }
 
-    function importCSV(event) {
-        const file = event.target.files[0];
-        const statusElementId = 'importStatus';
-        showStatus(statusElementId, 'info', '正在处理文件...');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csvText = e.target.result;
+                    const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
+                    if (lines.length < 2) {
+                        showStatus(statusElementId, 'error', 'CSV文件内容无效或为空。');
+                        return;
+                    }
 
-        if (!file) {
-            showStatus(statusElementId, 'warning', '未选择文件。');
-            return;
-        }
-        if (!file.name.endsWith('.csv')) {
-            showStatus(statusElementId, 'error', '请选择一个 .csv 文件。');
-            return;
-        }
+                    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                    const requiredHeaders = ['date', 'happy', 'fulfilled', 'improve', 'grateful', 'think'];
+                    if (!requiredHeaders.every(h => headers.includes(h))) {
+                        showStatus(statusElementId, 'error', 'CSV文件列头不匹配。请确保包含 date, happy, fulfilled, improve, grateful, think。');
+                        return;
+                    }
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const csvText = e.target.result;
-                const lines = csvText.split(/\r?\n/).filter(line => line.trim() !== '');
-                if (lines.length < 2) {
-                    showStatus(statusElementId, 'error', 'CSV文件内容无效或为空。');
-                    return;
-                }
-
-                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-                const requiredHeaders = ['date', 'happy', 'fulfilled', 'improve', 'grateful', 'think'];
-                if (!requiredHeaders.every(h => headers.includes(h))) {
-                    showStatus(statusElementId, 'error', 'CSV文件列头不匹配。请确保包含 date, happy, fulfilled, improve, grateful, think。');
-                    return;
-                }
-
-                const tempLogsMap = new Map();
-                logs.forEach(log => {
-                    tempLogsMap.set(log.date, {
-                        date: log.date,
-                        happy: log.happy || '',
-                        fulfilled: log.fulfilled || '',
-                        improve: log.improve || '',
-                        grateful: log.grateful || '',
-                        think: log.think || ''
+                    const tempLogsMap = new Map();
+                    logs.forEach(log => {
+                        tempLogsMap.set(log.date, {
+                            date: log.date,
+                            happy: log.happy || '',
+                            fulfilled: log.fulfilled || '',
+                            improve: log.improve || '',
+                            grateful: log.grateful || '',
+                            think: log.think || ''
+                        });
                     });
+
+                    let importedCount = 0;
+                    let mergedCount = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = parseCSVLine(lines[i]);
+                        if (values.length !== headers.length) {
+                            console.warn(`跳过格式不正确的行: ${lines[i]}`);
+                            continue;
+                        }
+
+                        const entry = {};
+                        headers.forEach((header, index) => {
+                            entry[header] = values[index] || '';
+                        });
+                        
+                        if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+                             console.warn(`跳过无效日期行: ${lines[i]}`);
+                            continue;
+                        }
+                        
+                        importedCount++;
+
+                        if (tempLogsMap.has(entry.date)) {
+                            // 修复后的合并逻辑：只合并非空字段，并处理追加
+                            const existingEntry = tempLogsMap.get(entry.date);
+                            let isMerged = false;
+                            for (const field of requiredHeaders.slice(1)) {
+                                if (entry[field]) { // 如果新条目该字段非空
+                                    if (existingEntry[field]) { // 如果旧条目该字段也非空
+                                        existingEntry[field] += ', ' + entry[field]; // 追加
+                                    } else {
+                                        existingEntry[field] = entry[field]; // 替换为空的字段
+                                    }
+                                    isMerged = true;
+                                }
+                                // 如果新条目该字段为空，则保留原有内容，不做任何操作
+                            }
+                            if(isMerged) {
+                                 mergedCount++;
+                            }
+                            tempLogsMap.set(entry.date, existingEntry);
+                        } else {
+                            tempLogsMap.set(entry.date, {
+                                date: entry.date,
+                                happy: entry.happy || '',
+                                fulfilled: entry.fulfilled || '',
+                                improve: entry.improve || '',
+                                grateful: entry.grateful || '',
+                                think: entry.think || ''
+                            });
+                        }
+                    }
+
+                    logs = Array.from(tempLogsMap.values());
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+                    
+                    showStatus(statusElementId, 'success', `成功处理CSV文件。导入/更新了 ${importedCount} 条记录，其中合并了 ${mergedCount} 条记录。`);
+                    // 清除文件选择状态
+                    selectedFileForImport = null;
+                    document.getElementById('import-file').value = '';
+                    document.getElementById('selectedFileName').textContent = '';
+                    if (document.getElementById('preview-content').classList.contains('active')) {
+                        loadPreviewData();
+                    }
+                } catch (error) {
+                    console.error('导入CSV时出错:', error);
+                    showStatus(statusElementId, 'error', '导入失败，请检查文件格式或控制台错误信息。');
+                }
+            };
+            reader.onerror = function() {
+                showStatus(statusElementId, 'error', '读取文件时发生错误。');
+            };
+            reader.readAsText(selectedFileForImport, 'UTF-8');
+        }
+
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"' && !inQuotes) {
+                    inQuotes = true;
+                } else if (char === '"' && nextChar === '"') {
+                    current += '"';
+                    i++;
+                } else if (char === '"' && inQuotes) {
+                    inQuotes = false;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        // 修复导出中文乱码：添加 UTF-8 BOM
+        function exportCSV() {
+            const statusElementId = 'exportStatus';
+            if (logs.length === 0) {
+                showStatus(statusElementId, 'warning', '没有数据可导出。');
+                return;
+            }
+
+            try {
+                let csvContent = "\uFEFFdate,happy,fulfilled,improve,grateful,think\n"; // 添加 BOM
+
+                logs.forEach(log => {
+                    const escapeCSVField = (field) => {
+                        if (typeof field !== 'string') return field;
+                        if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+                            return `"${field.replace(/"/g, '""')}"`;
+                        }
+                        return field;
+                    };
+
+                    const row = [
+                        escapeCSVField(log.date),
+                        escapeCSVField(log.happy),
+                        escapeCSVField(log.fulfilled),
+                        escapeCSVField(log.improve),
+                        escapeCSVField(log.grateful),
+                        escapeCSVField(log.think)
+                    ].join(',');
+                    csvContent += row + '\n';
                 });
 
-                let importedCount = 0;
-                let mergedCount = 0;
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `daily_logs_${getCurrentDateStr()}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
-                for (let i = 1; i < lines.length; i++) {
-                    const values = parseCSVLine(lines[i]);
-                    if (values.length !== headers.length) {
-                        console.warn(`跳过格式不正确的行: ${lines[i]}`);
-                        continue;
-                    }
-
-                    const entry = {};
-                    headers.forEach((header, index) => {
-                        entry[header] = values[index] || '';
-                    });
-                    
-                    if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
-                         console.warn(`跳过无效日期行: ${lines[i]}`);
-                        continue;
-                    }
-                    
-                    importedCount++;
-
-                    if (tempLogsMap.has(entry.date)) {
-                        // 修复后的合并逻辑：只合并非空字段，并处理追加
-                        const existingEntry = tempLogsMap.get(entry.date);
-                        let isMerged = false;
-                        for (const field of requiredHeaders.slice(1)) {
-                            if (entry[field]) { // 如果新条目该字段非空
-                                if (existingEntry[field]) { // 如果旧条目该字段也非空
-                                    existingEntry[field] += ', ' + entry[field]; // 追加
-                                } else {
-                                    existingEntry[field] = entry[field]; // 替换为空的字段
-                                }
-                                isMerged = true;
-                            }
-                            // 如果新条目该字段为空，则保留原有内容，不做任何操作
-                        }
-                        if(isMerged) {
-                             mergedCount++;
-                        }
-                        tempLogsMap.set(entry.date, existingEntry);
-                    } else {
-                        tempLogsMap.set(entry.date, {
-                            date: entry.date,
-                            happy: entry.happy || '',
-                            fulfilled: entry.fulfilled || '',
-                            improve: entry.improve || '',
-                            grateful: entry.grateful || '',
-                            think: entry.think || ''
-                        });
-                    }
-                }
-
-                logs = Array.from(tempLogsMap.values());
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-                
-                showStatus(statusElementId, 'success', `成功处理CSV文件。导入/更新了 ${importedCount} 条记录，其中合并了 ${mergedCount} 条记录。`);
-                event.target.value = '';
-                if (document.getElementById('previewView').classList.contains('active')) {
-                    loadPreviewData();
-                }
+                showStatus(statusElementId, 'success', '导出成功！');
             } catch (error) {
-                console.error('导入CSV时出错:', error);
-                showStatus(statusElementId, 'error', '导入失败，请检查文件格式或控制台错误信息。');
+                console.error('导出CSV时出错:', error);
+                showStatus(statusElementId, 'error', '导出失败。');
             }
-        };
-        reader.onerror = function() {
-            showStatus(statusElementId, 'error', '读取文件时发生错误。');
-        };
-        reader.readAsText(file, 'UTF-8');
-    }
+        }
 
-    function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-
-            if (char === '"' && !inQuotes) {
-                inQuotes = true;
-            } else if (char === '"' && nextChar === '"') {
-                current += '"';
-                i++;
-            } else if (char === '"' && inQuotes) {
-                inQuotes = false;
-            } else if (char === ',' && !inQuotes) {
-                result.push(current.trim());
-                current = '';
+        function clearAllLogs() {
+            const statusElementId = 'clearStatus';
+            if (confirm("确定要清空所有日志记录吗？此操作不可撤销！\n请确保已导出重要数据。")) {
+                try {
+                    logs = [];
+                    localStorage.removeItem(STORAGE_KEY);
+                    showStatus(statusElementId, 'success', '所有日志记录已清空。');
+                    if (document.getElementById('preview-content').classList.contains('active')) {
+                        loadPreviewData();
+                    }
+                    // 隐藏其他状态信息
+                    document.getElementById('exportStatus').style.display = 'none';
+                    document.getElementById('importStatus').style.display = 'none';
+                } catch (error) {
+                    console.error('清空记录时出错:', error);
+                    showStatus(statusElementId, 'error', '清空记录失败。');
+                }
             } else {
-                current += char;
+                 showStatus(statusElementId, 'info', '清空操作已取消。');
             }
         }
-        result.push(current.trim());
-        return result;
-    }
 
-    // 修复导出中文乱码：添加 UTF-8 BOM
-    function exportCSV() {
-        const statusElementId = 'exportStatus';
-        if (logs.length === 0) {
-            showStatus(statusElementId, 'warning', '没有数据可导出。');
-            return;
-        }
-
-        try {
-            let csvContent = "\uFEFFdate,happy,fulfilled,improve,grateful,think\n"; // 添加 BOM
-
-            logs.forEach(log => {
-                const escapeCSVField = (field) => {
-                    if (typeof field !== 'string') return field;
-                    if (field.includes(',') || field.includes('"') || field.includes('\n')) {
-                        return `"${field.replace(/"/g, '""')}"`;
-                    }
-                    return field;
-                };
-
-                const row = [
-                    escapeCSVField(log.date),
-                    escapeCSVField(log.happy),
-                    escapeCSVField(log.fulfilled),
-                    escapeCSVField(log.improve),
-                    escapeCSVField(log.grateful),
-                    escapeCSVField(log.think)
-                ].join(',');
-                csvContent += row + '\n';
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `daily_logs_${getCurrentDateStr()}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            showStatus(statusElementId, 'success', '导出成功！');
-        } catch (error) {
-            console.error('导出CSV时出错:', error);
-            showStatus(statusElementId, 'error', '导出失败。');
-        }
-    }
-
-    function clearAllLogs() {
-        const statusElementId = 'clearStatus';
-        if (confirm("确定要清空所有日志记录吗？此操作不可撤销！\n请确保已导出重要数据。")) {
-            try {
-                logs = [];
-                localStorage.removeItem(STORAGE_KEY);
-                showStatus(statusElementId, 'success', '所有日志记录已清空。');
-                if (document.getElementById('previewView').classList.contains('active')) {
-                    loadPreviewData();
-                }
-                document.getElementById('exportStatus').style.display = 'none';
-                document.getElementById('importStatus').style.display = 'none';
-            } catch (error) {
-                console.error('清空记录时出错:', error);
-                showStatus(statusElementId, 'error', '清空记录失败。');
-            }
-        } else {
-             showStatus(statusElementId, 'info', '清空操作已取消。');
-        }
-    }
-
-    // 页面加载时初始化主界面日期
-    window.onload = function() {
-        document.getElementById('logDate').valueAsDate = new Date();
-    };
-</script>
-
+        // 页面加载时初始化主界面日期
+        window.onload = function() {
+            document.getElementById('logDate').valueAsDate = new Date();
+        };
+    </script>
 </body>
 </html>
