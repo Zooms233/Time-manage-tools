@@ -20,7 +20,7 @@
             line-height: 1.5;
         }
         .container {
-            max-width: 600px;
+            /* 移除固定max-width，让内容撑满 */
             margin: 0 auto;
             background-color: #fff;
             padding: 15px; /* 减小内边距 */
@@ -34,37 +34,49 @@
             margin-top: 10px;
             margin-bottom: 20px;
         }
-        
-        /* 重新设计的标签页样式 */
-        .tabs {
+        .nav {
             display: flex;
+            justify-content: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            gap: 8px; /* 减小按钮间距 */
+            flex-wrap: nowrap; /* 防止换行 */
         }
-        
-        .tab {
-            padding: 10px 20px;
+        .nav button {
+            flex: 1; /* 平均分配宽度 */
+            padding: 12px 5px; /* 增大触摸区域 */
+            border: none;
+            border-radius: 6px; /* 稍大圆角 */
+            background-color: #e4e6eb;
             cursor: pointer;
-            background-color: #f1f1f1;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
+            transition: background-color 0.2s, transform 0.1s;
+            white-space: nowrap;
+            font-size: 0.9rem; /* 稍小字体 */
+            color: #4b4f56;
+            font-weight: 500;
+            /* 移除outline可能影响视觉，但保留键盘焦点 */
+            outline: none;
         }
-        
-        .tab.active {
-            background-color: #4CAF50;
+        .nav button:focus {
+            /* 为键盘导航用户提供焦点指示 */
+            box-shadow: 0 0 0 2px #42b549;
+        }
+        .nav button:hover {
+            background-color: #d8dadf;
+        }
+        .nav button:active {
+            background-color: #ccd0d5;
+            transform: scale(0.98); /* 点击时轻微缩小 */
+        }
+        .nav button.active {
+            background-color: #42b549;
             color: white;
         }
-        
-        .tab-content {
+        .view {
             display: none;
         }
-        
-        .tab-content.active {
+        .view.active {
             display: block;
         }
-
         .form-group {
             margin-bottom: 18px; /* 增大表单项间距 */
         }
@@ -142,37 +154,67 @@
             color: #4b4f56;
             font-size: 1.2rem;
         }
-        .settings-section h3 {
-            margin-top: 0;
-            color: #333;
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%; /* 让文件输入按钮撑满 */
+            margin-bottom: 15px;
         }
-        
-        .settings-section button {
-            display: block;
-            margin: 10px 0;
-            padding: 10px 20px;
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-button {
+            display: block; /* 改为块级元素 */
+            width: 100%;
+            padding: 15px;
             background-color: #2196F3;
             color: white;
-            border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.2s;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
         }
-        
-        .settings-section button:hover {
+        .file-input-button:hover {
             background-color: #0b7dda;
         }
-        
-        .settings-section input[type="file"] {
-            margin-top: 10px;
+        button.export-btn, button.clear-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            outline: none;
         }
-        
-        .export-section {
-            margin-top: 20px;
+        button.export-btn:focus, button.clear-btn:focus {
+            box-shadow: 0 0 0 2px #42b549;
         }
-        
-        .export-section p {
-            margin: 5px 0;
+        button.export-btn {
+            background-color: #ff9500;
+            color: white;
+        }
+        button.export-btn:hover {
+            background-color: #e68600;
+        }
+        button.clear-btn {
+             background-color: #ff3b30;
+             color: white;
+        }
+        button.clear-btn:hover {
+            background-color: #d32f2f;
         }
 
         /* 预览界面样式 */
@@ -238,8 +280,8 @@
             .container {
                 padding: 10px;
             }
-            .tab {
-                padding: 10px 15px;
+            .nav button {
+                padding: 10px 3px;
                 font-size: 0.8rem;
             }
             .button-group button {
@@ -255,15 +297,15 @@
 
     <h1>日志记录系统</h1>
 
-    <!-- 重新设计的导航栏 -->
-    <div class="tabs">
-        <div class="tab active" id="main-tab">主界面</div>
-        <div class="tab" id="preview-tab">预览</div>
-        <div class="tab" id="settings-tab">设置</div>
+    <!-- 导航栏 -->
+    <div class="nav">
+        <button class="nav-btn active" onclick="showView('mainView')">主界面</button>
+        <button class="nav-btn" onclick="showView('previewView')">预览界面</button>
+        <button class="nav-btn" onclick="showView('settingsView')">设置</button>
     </div>
 
     <!-- 主界面 -->
-    <div id="main-content" class="tab-content active">
+    <div id="mainView" class="view active">
         <form id="logForm">
             <div class="form-group">
                 <label for="logDate">日期</label>
@@ -297,7 +339,7 @@
     </div>
 
     <!-- 预览界面 -->
-    <div id="preview-content" class="tab-content">
+    <div id="previewView" class="view">
         <h2>日志预览</h2>
         <div class="preview-container">
             <table id="logTable">
@@ -319,29 +361,32 @@
     </div>
 
     <!-- 设置界面 -->
-    <div id="settings-content" class="tab-content">
+    <div id="settingsView" class="view">
+        <h2>数据管理</h2>
+        
         <div class="settings-section">
-            <h3>数据导出</h3>
-            <div class="export-section">
-                <button id="export-data-btn">导出数据</button>
-                <p>点击按钮下载当前数据的CSV备份文件</p>
+            <h3>导入数据</h3>
+            <div class="file-input-wrapper">
+                <span class="file-input-button">选择CSV文件</span>
+                <input type="file" id="importFile" accept=".csv" onchange="importCSV(event)">
             </div>
-			<br>
-			<h3>数据导入</h3>
-            <div class="import-section">
-                <button id="import-data-btn">选择CSV文件导入</button>
-                <input type="file" id="import-file" accept=".csv">
-				<p>选择之前导出的CSV文件进行数据导入</p>
-                <p>导入格式: 表头:date,happy,fulfilled,improve,grateful,think</p>
-				<p>其中data数据列日期格式：yyyy.mm.dd</p>
-				<p>导入具有相同日期的新记录时，新内容将追加到现有内容之后（用,分隔）</p>
-            </div>
-			<br>
-			<h3>数据删除</h3>
-            <div class="clear-section">
-                <button id="clear-all-data-btn">清空所有数据</button>
-                <p>警告：此操作将删除所有日志记录</p>
-            </div>
+            <div id="importStatus" class="status" style="display:none;"></div>
+            <p><small>
+			导入格式:
+				表头:date,happy,fulfilled,improve,grateful,think<br>
+				其中data数据列日期格式：yyyy.mm.dd<br>
+			注意：导入具有相同日期的新记录时，新内容将追加到现有内容之后（用逗号和空格分隔）。</small></p>
+        </div>
+        
+        <div class="settings-section">
+            <h3>导出与清空</h3>
+            <button class="export-btn" onclick="exportCSV()">导出CSV</button>
+            <button class="clear-btn" onclick="clearAllLogs()">清空所有记录</button>
+            <div id="exportStatus" class="status" style="display:none;"></div>
+            <div id="clearStatus" class="status" style="display:none;"></div>
+            <p><small><strong>警告:</strong> 
+			数据存储在浏览器缓存中，在清理浏览器数据时注意导出数据记录。<br>
+			“清空所有记录”操作不可逆。请在执行前确认已导出重要数据。</small></p>
         </div>
     </div>
 
@@ -354,27 +399,24 @@
 
     // --- 视图切换逻辑 ---
     function showView(viewId) {
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
+        document.querySelectorAll('.view').forEach(view => {
+            view.classList.remove('active');
         });
         document.getElementById(viewId).classList.add('active');
 
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
-        
-        if (viewId === 'main-content') {
-            document.getElementById('main-tab').classList.add('active');
+        if (viewId === 'mainView') {
+            document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
             // 设置日期输入框默认值为当前日期
             document.getElementById('logDate').valueAsDate = new Date();
         }
-        else if (viewId === 'preview-content') {
-            document.getElementById('preview-tab').classList.add('active');
+        else if (viewId === 'previewView') {
+            document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
             loadPreviewData();
         }
-        else if (viewId === 'settings-content') {
-            document.getElementById('settings-tab').classList.add('active');
-        }
+        else if (viewId === 'settingsView') document.querySelector('.nav-btn:nth-child(3)').classList.add('active');
     }
 
     // --- 主界面功能 ---
@@ -603,7 +645,7 @@
                 
                 showStatus(statusElementId, 'success', `成功处理CSV文件。导入/更新了 ${importedCount} 条记录，其中合并了 ${mergedCount} 条记录。`);
                 event.target.value = '';
-                if (document.getElementById('preview-content').classList.contains('active')) {
+                if (document.getElementById('previewView').classList.contains('active')) {
                     loadPreviewData();
                 }
             } catch (error) {
@@ -698,7 +740,7 @@
                 logs = [];
                 localStorage.removeItem(STORAGE_KEY);
                 showStatus(statusElementId, 'success', '所有日志记录已清空。');
-                if (document.getElementById('preview-content').classList.contains('active')) {
+                if (document.getElementById('previewView').classList.contains('active')) {
                     loadPreviewData();
                 }
                 document.getElementById('exportStatus').style.display = 'none';
@@ -712,25 +754,9 @@
         }
     }
 
-    // 设置事件监听器
-    function setupEventListeners() {
-        document.getElementById('main-tab').addEventListener('click', () => showView('main-content'));
-        document.getElementById('preview-tab').addEventListener('click', () => showView('preview-content'));
-        document.getElementById('settings-tab').addEventListener('click', () => showView('settings-content'));
-        
-        // 为设置页面按钮添加事件监听器
-        document.getElementById('export-data-btn').addEventListener('click', exportCSV);
-        document.getElementById('import-data-btn').addEventListener('click', function() {
-            document.getElementById('import-file').click();
-        });
-        document.getElementById('import-file').addEventListener('change', importCSV);
-        document.getElementById('clear-all-data-btn').addEventListener('click', clearAllLogs);
-    }
-
     // 页面加载时初始化主界面日期
     window.onload = function() {
         document.getElementById('logDate').valueAsDate = new Date();
-        setupEventListeners();
     };
 </script>
 
