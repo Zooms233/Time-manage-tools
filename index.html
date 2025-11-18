@@ -1,244 +1,253 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>时间管理三工具</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<style>
-  :root {
-    --primary-color: #2c3e50;
-    --secondary-color: #ecf0f1;
-    --accent-color: #3498db;
-    --text-color: #2c3e50;
-    --bg-color: #ffffff;
-    --border-color: #bdc3c7;
-    --shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>时间管理三工具</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+      body {
+        display: flex;
+        min-height: 100vh;
+        font-family: "Segoe UI", sans-serif;
+        background-color: #f5f5f5;
+      }
 
-  body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f5f7fa;
-    color: var(--text-color);
-    line-height: 1.6;
-    padding: 0;
-    margin: 0;
-    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
-  }
-
-  .app-container {
-    display: block; /* 改为 block 显示，不再使用 flex 布局 */
-    min-height: 100vh; /* 使用最小高度 */
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
-    background-color: var(--bg-color);
-    margin: 10px;
-    border-radius: 8px;
-    overflow: visible; /* 改为 visible，允许内容溢出滚动 */
-  }
-
-  header {
-    background: linear-gradient(135deg, var(--primary-color), #4a6fa5);
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-
-  nav {
-    display: flex;
-    background-color: var(--secondary-color);
-    border-bottom: 1px solid var(--border-color);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  nav button {
-    flex: 1;
-    padding: 15px 10px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-color);
-    transition: all 0.3s ease;
-    outline: none;
-    position: relative;
-  }
-
-  nav button:hover {
-    background-color: rgba(0,0,0,0.05);
-  }
-
-  nav button.active {
-    color: var(--accent-color);
-    font-weight: bold;
-  }
-
-  nav button.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--accent-color);
-  }
-
-  main {
-    width: 100%;
-    padding: 0; /* Reset padding */
-    box-sizing: border-box;
-    min-height: calc(100vh - 200px); /* 计算剩余空间，减去header、nav和footer的大致高度 */
-  }
-
-  #tool-frame {
-    width: 100%;
-    height: 800px; /* 设置固定高度，确保有足够的内容用于滚动 */
-    border: none;
-    display: block;
-  }
-
-  footer {
-    text-align: center;
-    padding: 0.8rem;
-    background-color: var(--secondary-color);
-    border-top: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  /* 移动端适配 */
-  @media (max-width: 768px) {
-    .app-container {
-      margin: 0;
-      border-radius: 0;
-      min-height: 100vh;
-    }
-
-    header h1 {
-      font-size: 1.3rem;
-    }
-
-    nav {
-      flex-wrap: wrap;
-    }
-
-    nav button {
-      flex: 1 0 33.333%; /* 三按钮在一行显示，避免换行 */
-      font-size: 0.9rem;
-      padding: 12px 5px;
-    }
-
-    /* 在更小的屏幕上调整为两行 */
-    @media (max-width: 480px) {
-      nav {
+      /* 侧边栏 */
+      .sidebar {
+        width: 60px; /* 默认窄宽度 */
+        background: #2c3e50;
+        color: white;
+        padding: 10px 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        display: flex;
         flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+        transition: width 0.3s ease; /* 添加过渡动画 */
       }
 
-      nav button {
-        flex: 1 0 auto;
-        border-bottom: 1px solid var(--border-color);
+      .sidebar:hover {
+        width: 80px; /* 鼠标悬停时展开 */
       }
-    }
 
-    footer {
-      font-size: 0.8rem;
-      padding: 0.6rem;
-    }
-
-    #tool-frame {
-      height: 600px; /* 移动端适当减小高度 */
-    }
-  }
-
-  /* 针对非常小的屏幕优化 */
-  @media (max-width: 320px) {
-    header h1 {
-      font-size: 1.2rem;
-    }
-
-    nav button {
-      font-size: 0.8rem;
-      padding: 10px 5px;
-    }
-
-    #tool-frame {
-      height: 500px; /* 非常小的屏幕进一步减小高度 */
-    }
-  }
-</style>
-</head>
-<body>
-
-<div class="app-container">
-  <header>
-    <h1>🛠️ 简明三工具</h1>
-  </header>
-
-  <nav id="main-nav">
-    <button class="nav-btn active" data-src="事件收集箱.html">📝 事件收集箱</button>
-    <button class="nav-btn" data-src="四象限图.html">📊 四象限图</button>
-    <button class="nav-btn" data-src="日志记录系统.html">📔 日志记录系统</button>
-  </nav>
-
-  <main>
-    <iframe id="tool-frame" src="事件收集箱.html" title="工具面板"></iframe>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 一只鱼的工具箱</p>
-  </footer>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const navButtons = document.querySelectorAll('#main-nav .nav-btn');
-    const toolFrame = document.getElementById('tool-frame');
-
-    navButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        // Update active state
-        navButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-
-        // Load the selected tool
-        const src = button.getAttribute('data-src');
-        toolFrame.src = src;
-      });
-    });
-
-    // 防止iframe内部页面滚动影响主页面
-    toolFrame.addEventListener('load', () => {
-      try {
-        const iframeDoc = toolFrame.contentDocument || toolFrame.contentWindow.document;
-        const style = iframeDoc.createElement('style');
-        style.textContent = `
-          body {
-            -webkit-overflow-scrolling: touch;
-          }
-        `;
-        iframeDoc.head.appendChild(style);
-      } catch(e) {
-        // 忽略跨域错误
+      .logo {
+        text-align: center;
+        padding: 10px 5px;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #ecf0f1;
+        width: 100%;
+        box-sizing: border-box;
       }
-    });
-  });
-</script>
 
-</body>
+      .nav-menu {
+        list-style: none;
+        width: 100%;
+        padding: 0;
+      }
+
+      .nav-item {
+        padding: 15px 0;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #bdc3c7;
+        text-align: center;
+        font-size: 0.7em;
+        line-height: 1.2;
+        border-left: 3px solid transparent;
+        position: relative;
+      }
+
+      .nav-item span.emoji {
+        font-size: 1.4em;
+        margin-bottom: 4px;
+      }
+
+      .nav-item .label {
+        opacity: 0; /* 默认隐藏文字 */
+        transition: opacity 0.3s ease;
+      }
+
+      .sidebar:hover .nav-item .label {
+        opacity: 1; /* 悬停时显示文字 */
+      }
+
+      .nav-item:hover {
+        background: #34495e;
+        color: white;
+      }
+
+      .nav-item.active {
+        background: #3498db;
+        color: white;
+        font-weight: bold;
+        border-left: 3px solid #2c3e50;
+      }
+
+      /* 主内容区 */
+      .main-content {
+        flex: 1;
+        position: relative;
+      }
+
+      iframe {
+        width: 100%;
+        height: 100vh;
+        border: none;
+        background: white;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: #95a5a6;
+        font-size: 0.8em;
+        padding: 0 20px;
+      }
+
+      /* 移动端适配 */
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 50px; /* 移动端更窄 */
+          padding: 8px 0;
+        }
+
+        .sidebar:hover {
+          width: 60px; /* 移动端悬停展开宽度 */
+        }
+
+        .logo {
+          font-size: 1.3em;
+          margin-bottom: 12px;
+        }
+
+        .nav-item {
+          padding: 12px 0;
+        }
+
+        .nav-item span.emoji {
+          font-size: 1.2em;
+          margin-bottom: 3px;
+        }
+
+        .nav-item .label {
+          font-size: 0.6em;
+        }
+
+        .sidebar:hover .nav-item .label {
+          opacity: 1;
+        }
+
+        .footer {
+          font-size: 0.7em;
+          padding: 0 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .sidebar {
+          width: 45px; /* 超小屏幕更窄 */
+        }
+
+        .sidebar:hover {
+          width: 55px;
+        }
+
+        .logo {
+          font-size: 1.2em;
+        }
+
+        .nav-item {
+          padding: 10px 0;
+        }
+
+        .nav-item span.emoji {
+          font-size: 1.1em;
+        }
+
+        .footer {
+          font-size: 0.65em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="logo">⏰</div>
+      <ul class="nav-menu">
+        <li
+          class="nav-item"
+          data-page="event"
+          onclick="loadPage('事件收集箱.html')"
+        >
+          <span class="emoji">📝</span>
+          <span class="label">事件</span>
+        </li>
+        <li
+          class="nav-item"
+          data-page="quadrant"
+          onclick="loadPage('四象限图.html')"
+        >
+          <span class="emoji">📊</span>
+          <span class="label">四象限</span>
+        </li>
+        <li
+          class="nav-item"
+          data-page="journal"
+          onclick="loadPage('日志记录系统.html')"
+        >
+          <span class="emoji">📔</span>
+          <span class="label">日志</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <iframe id="mainFrame" src="事件收集箱.html"></iframe>
+      <div class="footer">© 2025 一只鱼的工具箱</div>
+    </div>
+
+    <script>
+      function loadPage(src) {
+        const frame = document.getElementById("mainFrame");
+        frame.src = src;
+
+        // 更新激活状态
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        // 根据 src 设置哪个为 active
+        if (src.includes("事件收集箱")) {
+          document.querySelector('[data-page="event"]').classList.add("active");
+        } else if (src.includes("四象限图")) {
+          document
+            .querySelector('[data-page="quadrant"]')
+            .classList.add("active");
+        } else if (src.includes("日志记录系统")) {
+          document
+            .querySelector('[data-page="journal"]')
+            .classList.add("active");
+        }
+      }
+
+      // 初始化时高亮第一个
+      document.querySelector('[data-page="event"]').classList.add("active");
+    </script>
+  </body>
 </html>
