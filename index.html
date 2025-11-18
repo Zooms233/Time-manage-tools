@@ -1,253 +1,307 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>时间管理三工具</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>时间管理三工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      body {
-        display: flex;
-        min-height: 100vh;
-        font-family: "Segoe UI", sans-serif;
-        background-color: #f5f5f5;
-      }
+    body {
+      display: flex;
+      min-height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f5f5f5;
+      transition: margin-left 0.3s ease;
+    }
 
-      /* 侧边栏 */
+    /* 侧边栏 */
+    .sidebar {
+      width: 60px;
+      background: #2c3e50;
+      color: white;
+      padding: 10px 0;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      transition: width 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      width: 0;
+      overflow: hidden;
+    }
+
+    .logo {
+      text-align: center;
+      padding: 10px 5px;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #ecf0f1;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .nav-menu {
+      list-style: none;
+      width: 100%;
+      padding: 0;
+      flex-grow: 1;
+    }
+
+    .nav-item {
+      padding: 15px 0;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #bdc3c7;
+      text-align: center;
+      font-size: 0.7em;
+      line-height: 1.2;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item span.emoji {
+      font-size: 1.4em;
+      margin-bottom: 4px;
+    }
+
+    .nav-item .label {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar:not(.hidden) .nav-item .label {
+      opacity: 1;
+    }
+
+    .nav-item:hover {
+      background: #34495e;
+      color: white;
+    }
+
+    .nav-item.active {
+      background: #3498db;
+      color: white;
+      font-weight: bold;
+      border-left: 3px solid #2c3e50;
+    }
+
+    /* 隐藏/显示按钮 - 独立于侧边栏 */
+    .toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(44, 62, 80, 0.25); /* 25% 透明度 */
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(44, 62, 80, 0.8); /* 悬停时增加透明度 */
+      transform: scale(1.1);
+    }
+
+    /* 侧边栏隐藏时按钮样式 */
+    .sidebar.hidden ~ .toggle-btn {
+      left: 20px; /* 始终固定在左边距 */
+    }
+
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+      background: white;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      color: #95a5a6;
+      font-size: 0.8em;
+      padding: 0 20px;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
       .sidebar {
-        width: 60px; /* 默认窄宽度 */
-        background: #2c3e50;
-        color: white;
-        padding: 10px 0;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
-        transition: width 0.3s ease; /* 添加过渡动画 */
+        width: 50px;
       }
 
-      .sidebar:hover {
-        width: 80px; /* 鼠标悬停时展开 */
+      .sidebar.hidden {
+        width: 0;
       }
 
       .logo {
-        text-align: center;
-        padding: 10px 5px;
-        margin-bottom: 15px;
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #ecf0f1;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      .nav-menu {
-        list-style: none;
-        width: 100%;
-        padding: 0;
+        font-size: 1.3em;
+        margin-bottom: 12px;
       }
 
       .nav-item {
-        padding: 15px 0;
-        cursor: pointer;
-        transition: background 0.3s;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: #bdc3c7;
-        text-align: center;
-        font-size: 0.7em;
-        line-height: 1.2;
-        border-left: 3px solid transparent;
-        position: relative;
+        padding: 12px 0;
       }
 
       .nav-item span.emoji {
-        font-size: 1.4em;
-        margin-bottom: 4px;
+        font-size: 1.2em;
+        margin-bottom: 3px;
       }
 
       .nav-item .label {
-        opacity: 0; /* 默认隐藏文字 */
-        transition: opacity 0.3s ease;
+        font-size: 0.6em;
       }
 
-      .sidebar:hover .nav-item .label {
-        opacity: 1; /* 悬停时显示文字 */
+      .sidebar:not(.hidden) .nav-item .label {
+        opacity: 1;
       }
 
-      .nav-item:hover {
-        background: #34495e;
-        color: white;
-      }
-
-      .nav-item.active {
-        background: #3498db;
-        color: white;
-        font-weight: bold;
-        border-left: 3px solid #2c3e50;
-      }
-
-      /* 主内容区 */
-      .main-content {
-        flex: 1;
-        position: relative;
-      }
-
-      iframe {
-        width: 100%;
-        height: 100vh;
-        border: none;
-        background: white;
+      .toggle-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1em;
+        bottom: 15px;
+        left: 15px;
       }
 
       .footer {
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: #95a5a6;
-        font-size: 0.8em;
-        padding: 0 20px;
+        font-size: 0.7em;
+        padding: 0 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar {
+        width: 45px;
       }
 
-      /* 移动端适配 */
-      @media (max-width: 768px) {
-        .sidebar {
-          width: 50px; /* 移动端更窄 */
-          padding: 8px 0;
-        }
-
-        .sidebar:hover {
-          width: 60px; /* 移动端悬停展开宽度 */
-        }
-
-        .logo {
-          font-size: 1.3em;
-          margin-bottom: 12px;
-        }
-
-        .nav-item {
-          padding: 12px 0;
-        }
-
-        .nav-item span.emoji {
-          font-size: 1.2em;
-          margin-bottom: 3px;
-        }
-
-        .nav-item .label {
-          font-size: 0.6em;
-        }
-
-        .sidebar:hover .nav-item .label {
-          opacity: 1;
-        }
-
-        .footer {
-          font-size: 0.7em;
-          padding: 0 10px;
-        }
+      .sidebar.hidden {
+        width: 0;
       }
 
-      @media (max-width: 480px) {
-        .sidebar {
-          width: 45px; /* 超小屏幕更窄 */
-        }
-
-        .sidebar:hover {
-          width: 55px;
-        }
-
-        .logo {
-          font-size: 1.2em;
-        }
-
-        .nav-item {
-          padding: 10px 0;
-        }
-
-        .nav-item span.emoji {
-          font-size: 1.1em;
-        }
-
-        .footer {
-          font-size: 0.65em;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- 侧边栏 -->
-    <div class="sidebar">
-      <div class="logo">⏰</div>
-      <ul class="nav-menu">
-        <li
-          class="nav-item"
-          data-page="event"
-          onclick="loadPage('事件收集箱.html')"
-        >
-          <span class="emoji">📝</span>
-          <span class="label">事件</span>
-        </li>
-        <li
-          class="nav-item"
-          data-page="quadrant"
-          onclick="loadPage('四象限图.html')"
-        >
-          <span class="emoji">📊</span>
-          <span class="label">四象限</span>
-        </li>
-        <li
-          class="nav-item"
-          data-page="journal"
-          onclick="loadPage('日志记录系统.html')"
-        >
-          <span class="emoji">📔</span>
-          <span class="label">日志</span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- 主内容区 -->
-    <div class="main-content">
-      <iframe id="mainFrame" src="事件收集箱.html"></iframe>
-      <div class="footer">© 2025 一只鱼的工具箱</div>
-    </div>
-
-    <script>
-      function loadPage(src) {
-        const frame = document.getElementById("mainFrame");
-        frame.src = src;
-
-        // 更新激活状态
-        document.querySelectorAll(".nav-item").forEach((item) => {
-          item.classList.remove("active");
-        });
-
-        // 根据 src 设置哪个为 active
-        if (src.includes("事件收集箱")) {
-          document.querySelector('[data-page="event"]').classList.add("active");
-        } else if (src.includes("四象限图")) {
-          document
-            .querySelector('[data-page="quadrant"]')
-            .classList.add("active");
-        } else if (src.includes("日志记录系统")) {
-          document
-            .querySelector('[data-page="journal"]')
-            .classList.add("active");
-        }
+      .logo {
+        font-size: 1.2em;
       }
 
-      // 初始化时高亮第一个
-      document.querySelector('[data-page="event"]').classList.add("active");
-    </script>
-  </body>
+      .nav-item {
+        padding: 10px 0;
+      }
+
+      .nav-item span.emoji {
+        font-size: 1.1em;
+      }
+
+      .toggle-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1em;
+        bottom: 12px;
+        left: 12px;
+      }
+
+      .footer {
+        font-size: 0.65em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 侧边栏 -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">⏰</div>
+    <ul class="nav-menu">
+      <li class="nav-item" data-page="event" onclick="loadPage('事件收集箱.html')">
+        <span class="emoji">📝</span>
+        <span class="label">事件</span>
+      </li>
+      <li class="nav-item" data-page="quadrant" onclick="loadPage('四象限图.html')">
+        <span class="emoji">📊</span>
+        <span class="label">四象限</span>
+      </li>
+      <li class="nav-item" data-page="journal" onclick="loadPage('日志记录系统.html')">
+        <span class="emoji">📔</span>
+        <span class="label">日志</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 隐藏/显示按钮 - 独立存在 -->
+  <button class="toggle-btn" id="toggleBtn">◀</button>
+
+  <!-- 主内容区 -->
+  <div class="main-content">
+    <iframe id="mainFrame" src="事件收集箱.html"></iframe>
+    <div class="footer">© 2025 一只鱼的工具箱</div>
+  </div>
+
+  <script>
+    function loadPage(src) {
+      const frame = document.getElementById('mainFrame');
+      frame.src = src;
+
+      // 更新激活状态
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // 根据 src 设置哪个为 active
+      if (src.includes('事件收集箱')) {
+        document.querySelector('[data-page="event"]').classList.add('active');
+      } else if (src.includes('四象限图')) {
+        document.querySelector('[data-page="quadrant"]').classList.add('active');
+      } else if (src.includes('日志记录系统')) {
+        document.querySelector('[data-page="journal"]').classList.add('active');
+      }
+    }
+
+    // 初始化时高亮第一个
+    document.querySelector('[data-page="event"]').classList.add('active');
+
+    // 侧边栏切换功能
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    toggleBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('hidden');
+      // 切换按钮图标
+      this.textContent = sidebar.classList.contains('hidden') ? '▶' : '◀';
+    });
+
+    // 页面加载完成后，如果侧边栏是隐藏的，立即显示按钮
+    window.addEventListener('load', function() {
+      if (sidebar.classList.contains('hidden')) {
+        toggleBtn.textContent = '▶';
+      }
+    });
+  </script>
+
+</body>
 </html>
