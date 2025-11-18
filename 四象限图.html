@@ -726,11 +726,16 @@
 
         // 拖拽相关函数
         let dragSrcEl = null;
+        let dragSrcIndex = null;
+        let dragSrcQuadrant = null;
 
         function handleDragStart(e) {
             dragSrcEl = this;
+            dragSrcIndex = parseInt(this.dataset.index);
+            dragSrcQuadrant = this.dataset.quadrant;
+
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/html', this.innerHTML);
+            e.dataTransfer.setData('text/plain', `${dragSrcQuadrant}-${dragSrcIndex}`);
         }
 
         function handleDragOver(e) {
@@ -738,7 +743,16 @@
                 e.preventDefault();
             }
             e.dataTransfer.dropEffect = 'move';
-            this.classList.add('drag-over');
+
+            // 检查目标元素是否是列表项
+            let target = e.target;
+            while (target && !target.classList.contains('item')) {
+                target = target.parentElement;
+            }
+
+            if (target && target !== dragSrcEl) {
+                target.classList.add('drag-over');
+            }
             return false;
         }
 
@@ -747,21 +761,47 @@
                 e.stopPropagation();
             }
 
-            this.classList.remove('drag-over');
+            // 移除所有拖拽高亮
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
 
-            if (dragSrcEl !== this) {
-                // 获取拖拽源和目标的象限和索引
-                const srcQuadrant = dragSrcEl.dataset.quadrant;
-                const srcIndex = parseInt(dragSrcEl.dataset.index);
+            // 获取目标元素
+            let target = e.target;
+            while (target && !target.classList.contains('item')) {
+                target = target.parentElement;
+            }
 
-                if (!isNaN(srcIndex) && srcQuadrant) {
-                    // 由于我们只在同一个列表内拖拽，这里简单地交换位置
-                    // 如果需要跨列表拖拽，需要额外的逻辑
-                    const srcItem = tasks[srcQuadrant].todo[srcIndex];
-                    if (srcItem) {
-                        // 重新排序 - 这里简化处理，实际上需要更复杂的逻辑来处理拖拽排序
-                        // 为了演示，我们只是重新渲染列表
-                        renderQuadrantList(srcQuadrant, 'todo');
+            // 检查是否是有效的拖拽目标
+            if (target && target !== dragSrcEl) {
+                const targetIndex = parseInt(target.dataset.index);
+                const targetQuadrant = target.dataset.quadrant;
+
+                // 确保拖拽发生在同一象限的待办列表中
+                if (dragSrcQuadrant === targetQuadrant && dragSrcQuadrant && targetQuadrant) {
+                    // 在同一象限内移动任务
+                    if (dragSrcIndex !== undefined && targetIndex !== undefined) {
+                        // 获取源项
+                        const itemToMove = tasks[dragSrcQuadrant].todo[dragSrcIndex];
+
+                        // 从原位置删除
+                        tasks[dragSrcQuadrant].todo.splice(dragSrcIndex, 1);
+
+                        // 计算新位置（如果目标项在原位置之后，需要调整索引）
+                        let newIndex = targetIndex;
+                        if (dragSrcIndex < targetIndex) {
+                            // 如果从前面移除，目标索引会前移一位
+                            newIndex = targetIndex - 1;
+                        }
+
+                        // 插入到新位置
+                        tasks[dragSrcQuadrant].todo.splice(newIndex, 0, itemToMove);
+
+                        // 保存到本地存储
+                        saveToLocalStorage();
+
+                        // 重新渲染对应象限的待办列表
+                        renderQuadrantList(dragSrcQuadrant, 'todo');
                     }
                 }
             }
@@ -772,6 +812,9 @@
             document.querySelectorAll('.drag-over').forEach(el => {
                 el.classList.remove('drag-over');
             });
+            dragSrcEl = null;
+            dragSrcIndex = null;
+            dragSrcQuadrant = null;
         }
 
         // 导出数据
