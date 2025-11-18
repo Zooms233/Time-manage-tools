@@ -32,15 +32,14 @@
   }
 
   .app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    display: block; /* 改为 block 显示，不再使用 flex 布局 */
+    min-height: 100vh; /* 使用最小高度 */
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
     background-color: var(--bg-color);
     margin: 10px;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible; /* 改为 visible，允许内容溢出滚动 */
   }
 
   header {
@@ -48,7 +47,8 @@
     color: white;
     padding: 1rem;
     text-align: center;
-    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   header h1 {
@@ -60,7 +60,8 @@
     display: flex;
     background-color: var(--secondary-color);
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   nav button {
@@ -97,15 +98,17 @@
   }
 
   main {
-    flex-grow: 1;
-    overflow: hidden; /* Contain iframe scroll */
+    width: 100%;
     padding: 0; /* Reset padding */
+    box-sizing: border-box;
+    min-height: calc(100vh - 200px); /* 计算剩余空间，减去header、nav和footer的大致高度 */
   }
 
   #tool-frame {
     width: 100%;
-    height: 100%;
-    border: none; /* Remove default border */
+    height: 800px; /* 设置固定高度，确保有足够的内容用于滚动 */
+    border: none;
+    display: block;
   }
 
   footer {
@@ -115,7 +118,8 @@
     border-top: 1px solid var(--border-color);
     font-size: 0.85rem;
     color: #7f8c8d;
-    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* 移动端适配 */
@@ -123,50 +127,58 @@
     .app-container {
       margin: 0;
       border-radius: 0;
-      height: 100vh;
+      min-height: 100vh;
     }
-    
+
     header h1 {
       font-size: 1.3rem;
     }
-    
+
     nav {
       flex-wrap: wrap;
     }
-    
+
     nav button {
       flex: 1 0 33.333%; /* 三按钮在一行显示，避免换行 */
       font-size: 0.9rem;
       padding: 12px 5px;
     }
-    
+
     /* 在更小的屏幕上调整为两行 */
     @media (max-width: 480px) {
       nav {
         flex-direction: column;
       }
-      
+
       nav button {
         flex: 1 0 auto;
         border-bottom: 1px solid var(--border-color);
       }
     }
-    
+
     footer {
       font-size: 0.8rem;
       padding: 0.6rem;
     }
+
+    #tool-frame {
+      height: 600px; /* 移动端适当减小高度 */
+    }
   }
-  
+
   /* 针对非常小的屏幕优化 */
   @media (max-width: 320px) {
     header h1 {
       font-size: 1.2rem;
     }
-    
+
     nav button {
       font-size: 0.8rem;
       padding: 10px 5px;
+    }
+
+    #tool-frame {
+      height: 500px; /* 非常小的屏幕进一步减小高度 */
     }
   }
 </style>
@@ -209,7 +221,7 @@
         toolFrame.src = src;
       });
     });
-    
+
     // 防止iframe内部页面滚动影响主页面
     toolFrame.addEventListener('load', () => {
       try {
