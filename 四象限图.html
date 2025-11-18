@@ -29,6 +29,7 @@
             color: #333;
         }
 
+        /* --- 统一的标签页样式 (来自事件收集箱.html) --- */
         .tabs {
             display: flex;
             margin-bottom: 15px;
@@ -36,20 +37,18 @@
         }
 
         .tab {
-            flex: 1;
-            padding: 12px 10px;
+            padding: 10px 20px; /* 调整为与事件收集箱一致的内边距 */
             cursor: pointer;
             background-color: #f1f1f1;
             border: 1px solid #ddd;
             border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            text-align: center;
-            font-size: 14px;
+            border-radius: 5px 5px 0 0; /* 顶部圆角 */
+            margin-right: 5px; /* 添加间距 */
         }
 
         .tab.active {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #4CAF50; /* 选中时的背景色 */
+            color: white; /* 选中时的文字颜色 */
         }
 
         .tab-content {
@@ -59,6 +58,7 @@
         .tab-content.active {
             display: block;
         }
+        /* --- 结束统一的标签页样式 --- */
 
         .quadrant-grid {
             display: grid;
@@ -322,6 +322,7 @@
     <div class="container">
         <h1>四象限图</h1>
 
+        <!-- 标签页结构保持不变，但样式已统一 -->
         <div class="tabs">
             <div class="tab active" id="todo-tab">待办</div>
             <div class="tab" id="completed-tab">已完成</div>
@@ -644,7 +645,7 @@
 
         // 设置事件监听器
         function setupEventListeners() {
-            // 标签页切换
+            // 标签页切换 (统一为事件收集箱的切换逻辑)
             todoTab.addEventListener('click', () => switchTab('todo'));
             completedTab.addEventListener('click', () => switchTab('completed'));
             settingsTab.addEventListener('click', () => switchTab('settings'));
@@ -695,7 +696,7 @@
             });
         }
 
-        // 切换标签页
+        // 切换标签页 (统一为事件收集箱的切换逻辑)
         function switchTab(tabName) {
             // 移除所有活动标签页的active类
             todoTab.classList.remove('active');
