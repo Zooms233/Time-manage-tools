@@ -8,32 +8,33 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background-color: #f5f5f5;
+            font-size: 16px;
         }
-        
+
         .container {
-            max-width: 600px;
+            max-width: 100%;
             margin: 0 auto;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 15px;
         }
-        
+
         h1 {
             text-align: center;
-            font-size: 24px;
+            font-size: 1.5rem;
             margin-top: 0;
             color: #333;
         }
-        
+
         .tabs {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #ddd;
         }
-        
+
         .tab {
             padding: 10px 20px;
             cursor: pointer;
@@ -43,27 +44,27 @@
             border-radius: 5px 5px 0 0;
             margin-right: 5px;
         }
-        
+
         .tab.active {
             background-color: #4CAF50;
             color: white;
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
         }
-        
+
         .item-list {
             list-style-type: none;
             padding: 0;
         }
-        
+
         .item {
-            padding: 10px;
+            padding: 12px;
             margin: 5px 0;
             background-color: #f9f9f9;
             border-radius: 4px;
@@ -71,100 +72,104 @@
             align-items: center;
             transition: background-color 0.3s;
         }
-        
+
         .item:hover {
             background-color: #f0f0f0;
         }
-        
+
         .item.completed {
             text-decoration: line-through;
             color: #888;
         }
-        
+
         .item-checkbox {
             margin-right: 10px;
-            transform: scale(1.2);
+            transform: scale(1.3);
         }
-        
+
         .item-text {
-            font-size: 18px;
+            font-size: 16px;
             flex-grow: 1;
         }
-        
+
         .completed-time {
             font-size: 14px;
             color: #888;
             margin-right: 10px;
         }
-        
+
         .delete-btn {
             background-color: #f44336;
             color: white;
             border: none;
             border-radius: 4px;
-            padding: 5px 10px;
+            padding: 8px 12px;
             cursor: pointer;
             font-size: 14px;
-            margin-left: 10px;
+            min-width: 50px;
         }
-        
+
         .delete-btn:hover {
             background-color: #d32f2f;
         }
-        
+
         .input-section {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
         }
-        
+
         #new-item-input {
-            width: 70%;
-            height: 30px;
-            padding: 5px;
+            width: calc(100% - 120px);
+            max-width: 300px;
+            height: 40px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
         }
-        
+
         #add-button {
             margin-left: 10px;
-            padding: 6px 15px;
+            padding: 10px 18px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            height: 40px;
         }
-        
+
         #add-button:hover {
             background-color: #45a049;
         }
-        
+
         .drag-over {
             background-color: #e6f7ff;
             border: 2px dashed #0088cc;
         }
-        
+
         /* 隐藏已完成页面的输入框 */
         #completed-content .input-section {
             display: none;
         }
-        
+
         /* 设置页面样式 */
         .settings-section {
             margin-top: 20px;
         }
-        
+
         .settings-section h3 {
             margin-top: 0;
             color: #333;
+            font-size: 1.2rem;
         }
-        
+
         .settings-section button {
             display: block;
+            width: 100%;
             margin: 10px 0;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background-color: #2196F3;
             color: white;
             border: none;
@@ -172,34 +177,72 @@
             cursor: pointer;
             font-size: 16px;
         }
-        
+
         .settings-section button:hover {
             background-color: #0b7dda;
         }
-        
+
         .settings-section input[type="file"] {
             margin-top: 10px;
+            width: 100%;
         }
-        
-        .export-section {
-            margin-top: 20px;
+
+        .export-section, .import-section, .clear-section {
+            margin: 15px 0;
         }
-        
-        .export-section p {
-            margin: 5px 0;
+
+        .export-section p, .import-section p, .clear-section p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .clear-section p {
+            color: #f44336;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .item {
+                padding: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-text {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .completed-time, .delete-btn {
+                align-self: flex-end;
+            }
+
+            #new-item-input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            #add-button {
+                width: 100%;
+                margin-left: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>收集箱</h1>
-        
+
         <div class="tabs">
             <div class="tab active" id="todo-tab">待办</div>
             <div class="tab" id="completed-tab">已完成</div>
             <div class="tab" id="settings-tab">设置</div>
         </div>
-        
+
         <div class="tab-content active" id="todo-content">
             <ul class="item-list" id="todo-list">
                 <!-- 待办事项将在这里动态添加 -->
@@ -209,7 +252,7 @@
                 <button id="add-button">添加</button>
             </div>
         </div>
-        
+
         <div class="tab-content" id="completed-content">
             <ul class="item-list" id="completed-list">
                 <!-- 已完成事项将在这里动态添加 -->
@@ -219,7 +262,7 @@
                 <button id="add-button-completed" disabled>添加</button>
             </div>
         </div>
-        
+
         <div class="tab-content" id="settings-content">
             <div class="settings-section">
                 <h3>数据导出</h3>
@@ -227,15 +270,15 @@
                     <button id="export-data-btn">导出数据</button>
                     <p>点击按钮下载当前数据的备份文件</p>
                 </div>
-				<br>
-				<h3>数据导入</h3>
+                <br>
+                <h3>数据导入</h3>
                 <div class="import-section">
                     <button id="import-data-btn">选择文件导入</button>
                     <input type="file" id="import-file" accept=".json">
                     <p>选择之前导出的JSON文件进行数据导入</p>
                 </div>
-				<br>
-				<h3>数据删除</h3>
+                <br>
+                <h3>数据删除</h3>
                 <div class="clear-section">
                     <button id="clear-all-data-btn">清空所有数据</button>
                     <p>警告：此操作将删除所有待办和已完成的事项</p>
@@ -280,29 +323,29 @@
                 li.className = 'item';
                 li.draggable = true;
                 li.dataset.index = index;
-                
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'item-checkbox';
                 checkbox.checked = false;
-                
+
                 const span = document.createElement('span');
                 span.className = 'item-text';
                 span.textContent = item.text;
-                
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.textContent = '删除';
                 deleteBtn.addEventListener('click', () => deleteTodoItem(index));
-                
+
                 checkbox.addEventListener('change', () => toggleCompleted(index));
-                
+
                 // 拖拽事件
                 li.addEventListener('dragstart', handleDragStart);
                 li.addEventListener('dragover', handleDragOver);
                 li.addEventListener('drop', handleDrop);
                 li.addEventListener('dragend', handleDragEnd);
-                
+
                 li.appendChild(checkbox);
                 li.appendChild(span);
                 li.appendChild(deleteBtn);
@@ -316,20 +359,20 @@
             completedItems.forEach((item, index) => {
                 const li = document.createElement('li');
                 li.className = 'item completed';
-                
+
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'completed-time';
                 timeSpan.textContent = item.completedTime;
-                
+
                 const span = document.createElement('span');
                 span.className = 'item-text';
                 span.textContent = item.text;
-                
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.textContent = '删除';
                 deleteBtn.addEventListener('click', () => deleteCompletedItem(index));
-                
+
                 li.appendChild(timeSpan);
                 li.appendChild(span);
                 li.appendChild(deleteBtn);
@@ -341,19 +384,19 @@
         function toggleCompleted(index) {
             const item = todoItems[index];
             if (!item) return;
-            
+
             // 移除待办列表中的项目
             todoItems.splice(index, 1);
-            
+
             // 添加到已完成列表
             completedItems.push({
                 text: item.text,
                 completedTime: new Date().toLocaleString()
             });
-            
+
             // 保存到本地存储
             saveToLocalStorage();
-            
+
             // 重新渲染列表
             renderTodoList();
             renderCompletedList();
@@ -381,7 +424,7 @@
                     text: text,
                     completed: false
                 });
-                
+
                 saveToLocalStorage();
                 renderTodoList();
                 newItemInput.value = '';
@@ -400,23 +443,23 @@
             todoTab.addEventListener('click', () => switchTab('todo'));
             completedTab.addEventListener('click', () => switchTab('completed'));
             settingsTab.addEventListener('click', () => switchTab('settings'));
-            
+
             // 添加按钮点击事件
             addButton.addEventListener('click', addNewItem);
-            
+
             // 输入框回车事件
             newItemInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     addNewItem();
                 }
             });
-            
+
             // 数据导出事件
             exportDataBtn.addEventListener('click', exportData);
-            
+
             // 数据导入事件
             importFileInput.addEventListener('change', handleFileImport);
-            
+
             // 清空数据事件
             clearAllDataBtn.addEventListener('click', clearAllData);
         }
@@ -454,12 +497,12 @@
                 completedItems: completedItems,
                 exportTime: new Date().toISOString()
             };
-            
+
             const dataStr = JSON.stringify(data, null, 2);
             const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
+
             const exportFileDefaultName = '事件收集箱数据备份.json';
-            
+
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
@@ -470,27 +513,27 @@
         function handleFileImport(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    
+
                     if (data.todoItems && data.completedItems) {
                         // 验证数据格式
                         if (Array.isArray(data.todoItems) && Array.isArray(data.completedItems)) {
                             todoItems = data.todoItems;
                             completedItems = data.completedItems;
-                            
+
                             // 保存到本地存储
                             saveToLocalStorage();
-                            
+
                             // 重新渲染列表
                             renderTodoList();
                             renderCompletedList();
-                            
+
                             alert('数据导入成功！');
-                            
+
                             // 清空文件输入框
                             importFileInput.value = '';
                         } else {
@@ -512,11 +555,11 @@
             if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
                 todoItems = [];
                 completedItems = [];
-                
+
                 saveToLocalStorage();
                 renderTodoList();
                 renderCompletedList();
-                
+
                 alert('所有数据已清空');
             }
         }
@@ -543,23 +586,23 @@
             if (e.stopPropagation) {
                 e.stopPropagation();
             }
-            
+
             this.classList.remove('drag-over');
-            
+
             if (dragSrcEl !== this) {
                 // 获取拖拽源和目标的索引
                 const srcIndex = parseInt(dragSrcEl.dataset.index);
                 const targetIndex = parseInt(this.dataset.index);
-                
+
                 // 交换数组中的元素
                 if (!isNaN(srcIndex) && !isNaN(targetIndex)) {
                     const temp = todoItems[srcIndex];
                     todoItems[srcIndex] = todoItems[targetIndex];
                     todoItems[targetIndex] = temp;
-                    
+
                     // 保存到本地存储
                     saveToLocalStorage();
-                    
+
                     // 重新渲染
                     renderTodoList();
                 }
